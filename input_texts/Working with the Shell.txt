@@ -1,0 +1,189 @@
+Working with the Shell:
+In this series of videos, we're going to cover customization of the shell, multiple sessions support, scripts, REXX execs, batch support, and translation issues.
+A shell user has several options to personalize the shell.
+A user can create their own .profile file where user  variables are defined to do things like point to a login script, define a search path to be used when locating a file or a directory, and identify the editor to be used.
+Environment variables can be defined in the login script.
+The login script is started each time a shell is started.
+The login script can contain all alias definitions and other setup instructions.
+By using the set command, the user can set options for the shell session.
+These options control the way the shell handles certain situations.
+When the shell is invoked as a login shell, /etc/profile and $HOME/.profile are used.
+If users want environment variables in a shell invoked from the current shell, they should identify a file in an ENV environment variable and place shell commands in the file.
+The system interprets the file named in ENV each time a new shell is invoked.
+Depending on the commands used to set it, an environment variable can be local (used only for the current process) or exported (used for the current process and for any other processes spawned by the current process).
+There are many environment variables set for your shell session, and, if requested, they are available to all commands or programs that the shell runs as child processes.
+Variables like LOGNAME, HOME, and SHELL are set for you by RACF when you are validated as a user of the system.
+Others like LOCPATH, LIBPATH, and MANPATH are lists of directories searched for locales, dynamic load libraries, and online documentation pages.
+The example shown here is from /samples/profile.
+All shell users get the environment variables set by this profile.
+Users can override some of the variables by setting the variables in their private profiles or in their shell sessions.
+Note that all environment variables are written with uppercase letters.
+The contents of /etc/profile are actually a shell script.
+It contains examples of the script programming language with if-then statements, it sets values for environment variables, and it issues some shell commands (export, umask, readonly).
+Any changes made in /etc/profile will take effect the next time a user invokes the shell.
+Here we see the three methods that shell users can use to customize the environment variables for their session.
+They can all be used, but the last setting will take precedence.
+First up the $HOME/.profile file.
+A sample is provided in /samples/.profile which can be copied to a shell user's home directory and modified.
+The ENV variable in the $HOME/.profile file can be set to a file name which is a shell script that sets environment variables.
+Shell users can use the env command to display the environment variables for their session and to change any of these variables.
+The change only lasts for the length of the session.
+If you use the OMVS command to log in to the shell, you can improve performance by using a logon procedure that does not contain any JOBLIB or STEPLIB DD allocations.
+This reduces the amount of storage that is copied for fork().
+It also prevents excessive searching of STEPLIB data sets and the propagation of STEPLIB data sets from the shell process to the shell command processes on exec().
+Statements in either the /etc/profile or $HOME/.profile files, as shown here, improve the shell's performance for users who enter the OMVS command from ISPF or with STEPLIB data sets allocated.
+We'll continue to look at the shell in the next video, starting with multi-session support.
+
+Shell Scripts and REXX:
+The TSO/E OMVS command will allow users to start more than one session with the shell.
+Only one session is displayed at a time on the screen.
+The multisession support in the shell allows these shell processes to reside as tasks in the same address space.
+The user can switch between different sessions using a PF key.
+The following are OMVS subcommands to control the multisession support.
+Those are: OPEN which starts a new shell session.
+CLOSE or QUIT closes a shell session.
+QUITALL ends all sessions and returns to TSO/E.
+NEXTSESS switches to the next session.
+And PREVSESS switches to the previous session.
+The non-TSO user can log in to multiple shell sessions using the same user ID and password.
+You can also be logged on to the shell using the TSO/E interface and the rlogin interface using the same user ID and password.
+So here's an example of a shell script with some logic.
+This example has a for loop (FOR, DO, DONE).
+It has also an if conditional that runs a sequence of commands if a particular condition is met (IF, THEN, FI).
+This example of a shell script takes one positional parameter, giving the name of a file.
+The script looks in the working directory and finds the names of all .c files.
+The if control structure inside the for loop tests each file to see if it is older than the file named on the command line.
+If the .c file is older, echo displays the name, and the file is compiled.
+So what we've seen there is a shell script has the capability to run a sequence of commands stored in a text file.
+The commands in the file can be run by entering the file name on the command line.
+After a shell script is created, a user needs read and execute permission to run the script.
+A shell is like a program made up of shell commands.
+The shell supports many of the features of regular programming languages like variables, control structures, and functions.
+A set of z/OS UNIX extensions to TSO/E REXX provides the capability for REXX execs to access z/OS UNIX callable services.
+The z/OS UNIX extensions to REXX are called syscall commands, and they have names that correspond to the names of the callable services they invoke, for example, exec, fork, and pipe.
+REXX execs using z/OS UNIX extensions can run from TSO/E or in z/OS batch and access the z/OS UNIX functions and services through a host command environment rather than discrete external functions.
+The host command environment is called SYSCALL.
+The environment must be initialized by a SYSCALLS('ON') statement in the beginning of the exec.
+REXX execs can also be run in the z/OS UNIX shell or from a C program using the exec() system call.
+This is different from shell scripts which are only interpreted in the shell.
+This also means that shell scripts can invoke a REXX exec just like they would invoke any program.
+When running a REXX exec in the shell or from a C program, the SYSCALL environment is automatically initialized.
+There are many ways in z/OS UNIX to send a message to another user.
+Which method to use depends on the requirements and time frame that you want the message to be sent such as logger and write.
+As a TSO user, you might prefer to just use facilities provided by TSO.
+The clock daemon (cron) is a facility that allows you to run a command at a specific time, run a command in batch when the system activity is low, or set up commands, scripts, or programs to run at the same time every day or every week.
+Batch work is assigned bottom priority.
+The cron daemon examines the at, batch, or crontab files at initialization or whenever they change and starts the functions at the specified times.
+It uses the time zone in effect when the command is executed.
+Therefore, be sure to set the TZ environment variable before starting cron.
+In the next video we'll look at BPXBATCH.
+
+BPXBATCH:
+BPXBATCH is provided to make it easier to run shell scripts and z/OS UNIX application programs that reside in HFS through the z/OS batch environment.
+Users that do most of their work in TSO/E can use BPXBATCH instead of entering the shell.
+BPXBATCH can be invoked by JCL as a batch job, as a command in TSO/E, from within a REXX exec, or with OSHELL.
+z/OS UNIX C programs require that STDIN, STDOUT, and STDERR be defined.
+Many C functions also use this to define input and output.
+For BPXBATCH, the default for STDIN and STDOUT is /dev/null, and STDERR is the same as STDOUT.
+This can be changed to file names by using the DD names STDIN, STDOUT, and STDERR.
+Limitations in BPXBATCH input and output make it more difficult to create and maintain BPXBATCH jobs compared to other batch utilities.
+But BPXBATCH has been enhanced to allow far greater parameter input and to allow output to be directed to traditional z/OS data sets.
+BPXBATCH allows  up to 64K of parameter data to be supplied as input to BPXBATCH.
+It also allows both STDOUT and STDERR to specify traditional z/OS data sets to be the target of the output of the BPXBATCH jobs.
+BPXBATCH supports up to...
+and lets be more precise than 64K here...  65,536 characters of parameter data.
+This is supported by using a STDPARM DD that points to a z/OS data set or UNIX file that contains the parameter data.
+The z/OS data sets that can be used include SYSIN, sequential, and PDS/PDSE members.
+BPXBATCH now also supports the specification of z/OS data sets on the STDOUT and STDERR DDs.
+This allows output from BPXBATCH jobs to be directed to SYSOUT data sets, sequential data sets, or PDS/PDSE members.
+To avoid truncation of the output lines, the LRECL of one or more data sets should be large enough to handle lines of output from typical UNIX commands.
+Here's an example of a BPXBATCH job.
+Notice BPXBATCH allows both STDOUT and STDERR to specify traditional z/OS data sets to be the target of the output of the BPXBATCH jobs.
+BPXBATSL provides you with an alternate entry point into BPXBATCH and forces a program to run using a local spawn instead of fork or exec as BPXBATCH does.
+This ultimately allows a program to run faster.
+Here we see BPXBATSL running a local spawn of a program.
+In the next video we're going to look at solutions to address some common problems.
+
+ASCII and EBIDIC Considerations:
+Okay so we're going to look at some common issues that we need to take into consideration.
+Data transferred into z/OS from any non-z/OS platform probably requires this translation.
+Most workstation and UNIX systems store their data in ASCII format.
+Also, the terminals on those systems use the ASCII format for display characters.
+This translation is easy to do if the file is all text data.
+The transfer tool that you use has the capability to specify conversion.
+For example, a pax command explodes, translates, and decompresses a file archived on a UNIX system.
+NFS and FTP do this translation automatically unless the data is defined as binary.
+You can also customize the translation tables that these tools use.
+If your data is part numeric and part text, you might have to do some translation manually on a field-by-field basis.
+Some sorting functions might give different results on an EBCDIC system from an ASCII system.
+This difference might require application changes.
+z/OS UNIX is EBCDIC.
+Most other UNIX platforms are ASCII.
+ASCII programs with nasty dirty programming shown here cannot be easily ported.
+Now one solution is programs can be complied as ASCII programs.
+Programs are marked in USS if they are EBCDIC or ASCII.
+Another problem that occurs when porting programs is I/O to files, which was originally ASCII.
+Solutions here include keeping the file as ASCII, marking the file as ASCII, and let autoconversion be done in the USS logical file system, or tagging the file as a text file with coded character set ID (CCSID) 819.
+If you’re not using enhanced ASCII and autoconversion, then currently there are few facilities available on z/OS to display and change ASCII or UNICODE data.
+You cannot use ISPF or OEDIT.
+The increasing use of Java on z/OS and the use of ASCII encoded XML documents means there is more and more ASCII data being stored on z/OS.
+Unfortunately, it is generally necessary for z/OS users to download ASCII data to a workstation supporting the ASCII character set in order to view or change this data.
+Since the ISPF editor is the most popular and well known editor on z/OS, the benefit of being able to display and change ASCII data on z/OS is best delivered by adding this support to the ISPF editor.
+With z/OS, use the SOURCE ASCII and LF commands to edit ASCII data stored in z/OS data sets.
+For UNIX files, you have to use ISPF 3.17 “EA - Edit an ASCII file” or “VA - View an ASCII file”.
+We're showing an example of using the edit SOURCE ASCII and LF commands to display ASCII data.
+To activate the ASCII editing facility for a file, the user will first start editing the file as they would for a normal EBCDIC file.
+When the EDITOR primary line command SOURCE ASCII is entered, the EDITOR will treat the source data as though it is ASCII data and will convert it from ASCII to the CCSID of the terminal for display purposes, although the data will remain unchanged within the file.
+When the user at the terminal inputs or modifies data at the terminal, the editor will translate the data entered from the CCSID of the terminal to ASCII prior to storing the data in the file.
+The edit RESET primary command has been modified to support the SOURCE keyword which will cause the editor to revert back to a normal mode where the data is not translated from/to ASCII when displaying and receiving input from the terminal.
+In the final video in this module, we're going to revisit everybody's favorite topic - code pages!
+
+Translation Considerations:
+
+The world we live in today is a global world; we no longer conduct business solely within one country.
+Our applications must make the transition from one country to another seamlessly.
+The XPG standards are defining what services must be available to effect this transition.
+This process is called internationalization.
+This involves the display and printing of characters, both common ones and ones unique to individual languages.
+The format of date and monetary fields, and the collating sequence of the characters.
+Now to get a better grip on this, let's first off define some terms.
+A character set is the set of characters that you see on your keyboards or your printers that you can print.
+Internally, those characters are represented by unique hexadecimal values in memory.
+The relationship between the hexadecimal value and the character diagram is to find in a list called a code page.
+z/OS itself has no support for code pages.
+TSO, ISPF has support for code pages like z/OS Unix, but differently.
+Each country and region might also have a unique code page called the country extended code page, which relates the hexadecimal values from 00 to FF into a character set with the different characters used, including needed letters in that language.
+Data coming from z/OS datasets or from a workstation could be in any of the code pages shown here.
+The special characters shown here are the 14 variant characters that are often different between the code pages.
+The individual country extended code page includes characters, letters in the alphabet that also require unique considerations.
+This diagram illustrates some of the problems you meet in an international environment.
+Let's look at the various translation issues and some solutions.
+First, let's look at a relatively simple situation in a USA environment.
+Here are some possibilities to consider.
+Customize your keyboard using the features of the emulator to correctly correct hexadecimal coding for the characters.
+If you're a TSO user, specifying the OMVS convert parameter when you enter the shell.
+If you're using the z/OS Unix shell through the TCPIP or a login or tele support, use the chcp shell command to convert from ASCII to the z/OS Unix code page.
+When using OPUT, OGET, and OCOPY, use the convert parameters on these statements.
+But what about shell scripts and translation with international character sets? Since many shell scripts use special characters, they must run the code page they were created with.
+This means that uses in other countries have to have their own translated copy of the script, or they'll have to change to the code page that goes with the script.
+The ICOPY command can be used to translate the scripts from one code page to another.
+Here you see that hash sign is represented as something else when you change the code page.
+This character has a special meaning in a shell script.
+If this character is changed to something else, well, the shell script will not work as it should.
+This visual illustrates the problem from another angle.
+Here is a script with 3270 emulator program in IBM 1047 USA code page, and IBM 277 Danish code page.
+These are all things to watch out for when using international character sets.
+Let's wrap this up with a comparison of different functions in TSO and the Unix shell.
+Command processing in the shell is similar to command processing for C lists.
+In combination with the shell in utilities, the shell provides a programming environment as rich as the REXX environment in z/OS.
+Hierarchical files can be edited from z/OS using ISPF menus.
+The ISPF menus can be invoked by the TSO commands OEDIT and OBROWSE.
+In the shell, the editor can be used to edit HFS files.
+In z/OS, SDSF is used to monitor and control batch jobs.
+The TSO/E commands, status, cancel, and output can also be used.
+In the shell, there are multiple commands to control jobs including ps, jobs, kill, fg, bg, and wait.
+Background jobs are submitted to the TSO/E commands submit in a z/OS environment.
+In the shell, a command ended with an ampersand runs in the background.
+You can also use the shell submit command.
+Now in the next module, we'll move on to address functions in z/OS Unix.
+

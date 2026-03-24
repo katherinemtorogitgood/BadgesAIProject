@@ -1,0 +1,55 @@
+IBM Z101 Definitions
+
+IBM Z
+IBM Z is a family of modern infrastructure that runs enterprise operating systems and IBM Z software.
+
+z/OS
+z/OS is IBM’s flagship operating system for IBM Z mainframes.
+
+TSO/E
+TSO/E stands for Time Sharing Option/Extensions. It allows users to create an interactive session with the z/OS system and provides a basic command prompt interface to z/OS.
+
+ISPF
+ISPF stands for Interactive System Productivity Facility. It is a menu-driven interface for user interaction with a z/OS system and provides utilities, an editor, and ISPF applications.
+
+COBOL
+COBOL stands for Common Business-Oriented Language. It is a high-level programming language commonly used for business data processing.
+
+JCL
+JCL stands for Job Control Language. It is used to tell z/OS where to find input, how to process that input, and what to do with the resulting output.
+
+VSAM
+VSAM stands for Virtual Storage Access Method. It refers both to a data set type and to the access method used to manage different kinds of data.
+
+Zowe
+Zowe is an open-source framework for z/OS from the Open Mainframe Project that provides a more modern way to work with z/OS systems.
+
+Mainframe
+A mainframe is a large enterprise computer system used for secure, reliable, and high-volume processing.
+
+Fintech
+Fintech means financial technology. It refers to systems and software used in banking, payments, reporting, fraud monitoring, and other financial services.
+
+Fintech mainframe systems
+Fintech mainframe systems are mainframe-based applications used in financial services to process transactions, manage account data, run batch workloads, and support secure high-volume operations.
+
+Batch processing
+Batch processing is the execution of groups of jobs at scheduled times without user interaction.
+
+Transaction processing
+Transaction processing is the handling of individual business events such as payments, transfers, withdrawals, deposits, and account updates.
+
+Example questions
+What is IBM Z?
+What is z/OS?
+What does TSO/E stand for?
+What is ISPF?
+What does COBOL stand for?
+What is JCL?
+What is VSAM?
+What is Zowe?
+What is a mainframe?
+What is fintech?
+What are fintech mainframe systems?
+What is batch processing?
+What is transaction processing?

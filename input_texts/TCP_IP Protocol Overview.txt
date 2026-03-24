@@ -1,0 +1,332 @@
+﻿TCP/IP Protocol Overview
+
+
+Unit 1 - Introduction
+Unit 1: Introduction
+ 
+Slide 1:
+Hello, this is the introduction to understand TCP/IP, Unit 1.
+ 
+Slide 2:
+TCP/IP refers to a common communication platform across a heterogeneous computer network. It allows for dissimilar platforms to communicate with each other using standard TCP/IP protocols.
+ 
+Slide 3:
+TCP/IP has a layered design that is called a protocol stack, or just stack for short. Each layer in a protocol stack handles a different aspect of communications. This will be expanded in the next slide.
+Each host and a TCP/IP network must have a TCP/IP stack to communicate with the other hosts. In order to accomplish this, each host must have a TCP/IP stack configured which follows specific guidelines.
+ 
+Slide 4:
+Protocol Stack
+The stacks are from the top down:
+·           Application Layer
+·           Transport / Protocol Layer
+·           Internet Protocol (IP) / Network layer
+·           Interface Layer (IF) / Link Layer
+The transport Layer. We will start from the bottom. The Interface Layer is normally handled by the hardware, for example, Ethernet adapters, or in the case of z/OS, OSA adapters using Ethernet. Other examples of z/OS are HiperSockets RDMA or LCS.
+The IP Network Layer, IP / Network Layer, called the Internet Protocol Layer, will handle things like routing and IP addressing which will be covered in later units.
+The Transport Protocol Layer, for example, TCP which is a connection-oriented reliable delivery of data, or UDP which is connectionless. And it allows for unreliable delivery of data.
+And finally, the Application Layer or applications using sockets transfer data to peer hosts. Examples of some of this may be web servers or browsers, FTP, email, or etc.
+ 
+ 
+Slide 5:
+RFCs
+As I mentioned, in order for TCP/IP stacks to communicate, they have to communicate with each other correctly using specific protocols. And those protocols are defined in something called RFCs. So, this is how we get stuff on different platforms that may be implemented differently, but they must follow the same rules.
+The rules are defined in documents called Requests for Comments (RFCs). The rules are defined and documented in the RFC. as I mentioned, each of the RFC will have a specific status, which would really make it a required RFC and TCP/IP implementations. Once an RFC has become fully accepted by the IETF and that will become an Internet standard. Some RFCs may be replacements for older RFCs, for instance, RFC 793, which is the TCP protocol replaces obsoletes RFC 761.
+Each RFC is identified by a number, for instance, RFC 1122. And I've included a link on the bottom for the including to actually get to the RFC index to look at specific RFCs.
+ 
+Slide 6:
+Teaching method
+We'll be looking at the TCP protocol stack from the bottom up.
+We'll start with the link layer and use Ethernet for an example.
+ 
+Slide 7:
+We will continue your learning in Unit 2, which will start by covering the Interface Layer, or IF, also known as the Link Layer.
+ 
+ 
+Unit 2: Link Layers
+ 
+Slide 1:
+We will continue with Unit 2, Link Layer.
+ 
+Slide 2:
+The Link layer is designed to directly interface with the hardware portion of the network, for example an OSA adapter with an ethernet Network Interface Card (NIC).
+·           The main function of the link layer ID to send and receive packets from the physical network. It is also responsible for mapping Internet addresses (IP addresses) to the physical Mac addresses by using ARP protocol.
+·           ARP is a hardware function that uses ARP request broadcast frames to query all hosts on a subnet to find out which host handles routing or owns a specific IP address.
+·           The responder of the ARP request broadcast will send an ARP reply to the initiator of the ARP broadcast.
+ 
+Slide 3:
+First came the LAN.
+·           Lan stands for Local Area Network.
+·           In its simplest form, a LAN consists of several computers connected by a wire.
+·           Computers on a LAN are usually in proximity, for instance in one building.
+·           Switches are often used to provide a means of multiplexing the connectivity of the hosts on a LAN.
+ 
+Slide 4:
+LAN terminology
+·           Interface - Hardware that can send and receive bits of data.
+·           Packet - The bundle of bytes sent or received by a device. For instance, an IP packet would consist of an IP header, followed by a specific protocol header, and eventually the application data. More on IP packets will be forth coming.
+·           Link or Physical Medium - Whatever is used to connect two or more devices, for example ethernet cables and switches.
+·           Sniffer - A device or software program that allows for collecting traces of packets on the physical Medium. This type of trace would most commonly be used by network support personnel to debug problems.
+·           MTU -   MTU stands for Maximum Transmission Unit. This is the largest packet, including protocol headers that a device can send or receive. The term MSS (Maximum Segment size) is the size of the underlying data when all protocol headers have been removed.
+ 
+Slide 5:
+·           Some of the more common Link Layer devices used in today’s networks are Wireless, also known as WIFI.
+·           Loopback, which is same host and doesn't traverse any physical network.
+·           Ethernet, which consists of DIX v2 or IEE802.3. The main differences between these types of Ethernet are the frame layout that each uses.
+·           And last RDMA (Remote Direct Memory Access), which is a relatively new protocol which requires special network adapters and network fabric.
+ 
+Slide 6:
+Some examples of the Interface Types used by the Link Layer are:
+·           Point to Point this type of interface can only send and receive packets between one partner pair.
+·           Broadcast Capable, an interface that can send a packet to every directly connected network interface at the same time, for example ARP broadcasts.
+·           Multicast Capable, an Interface that can send a packet to a subset of the directly connected interfaces at the same time, for example streaming video services.
+ 
+Slide 7:
+An Ethernet LAN
+·           We will focus on ethernet, as it is the most widely used Network Interface.  A LAN that has only Ethernet devices attached may be called an Ethernet LAN or simply Ethernet.
+·           Multiple computers with Ethernet adapters are connected to one physical ethernet cable using a switch or switches.
+·           The ethernet Unit of data exchange has maximum frame sizes of 1518 bytes and 9018 bytes if Jumbo ethernet is enabled and used. Note that if VLAN tagging is used the maximum frame sizes increase to 1522 and 9022 bytes respectively.
+·           In an ethernet discussion, frame means the same as packet.
+ 
+Slide 8:
+Here is an example of an Ethernet frame for non VALN and for VLAN enabled ethernet.
+Notice that the ethernet frame uses six-byte hardware addresses (MAC addresses) as the source and destination of the frame.
+The ethernet type section is used to provide further breakdown of the type of data that the frame will be carrying. For example:
+·           x0800 indicates and IPv4 packet will be included in the frame.
+·           x0806 indicates that the ethernet frame will be used for ARP processing.
+·           x86DD indicates that the ethernet frame will be used for IPv6 packets.
+·           x8100 indicates that the frame will include IEEE 8021Q Tagging (VLAN tagging). This type of Ethernet frame requires a different format frame.
+ 
+Slide 9:
+All data sent from an ethernet adapter will be included in payload section in the ethernet frame. 
+This is referred to as encapsulation.
+As noted previously, the header contains the hardware source and destination address (MAC), and the type code of the ethernet.
+All of this is done by the actual ethernet adapter hardware being used.
+ 
+Slide 10:
+Now that we have briefly discussed LANs, we need to discuss how these fit into what we know of as the Internet…
+·           When different types of LANs are connected, they result in what is called an internet. For example, you might have a phone using wireless, and you might be using a banking application that may access data from a host that is using ethernet
+·           Different LANs may have many different hardware characteristics, different packet formats, and different addressing schemes, etc.
+·           It is the job of the Network Layer to smooth over these differences in order for connectivity to take place
+ 
+Slide 11:
+The diagram provides a visual on How the Network Layer (IP Layer), which will be covered in more detail, bridges different physical network types by using services provided by the Lower Link Layer. The key difference between the Link Layer and Network (IP) layer is that the latter is software vs hardware
+ 
+Slide 12:
+Using Ethernet as our example. We have seen that the Link Layer....
+·           Directly interfaces with the network hardware to send and receive packets/frames
+·           And it encapsulates/decapsulates frames it sends/receives by either adding or removing the ethernet frame header/trailer.
+ 
+Slide 13:
+We will continue your learning in Unit 3 where part 1 of the IP Layer (Network Layer) will be covered.
+ 
+ 
+ 
+ 
+Unit 3: IP Layer – Part I
+ 
+ 
+Slide 1:
+We will continue with Unit 3 , IP (internet Protocol) Layer.
+ 
+Slide 2:
+The IP Layer content will consist of Three Parts:
+Part 1:  IP address and IP datagram Delivery
+Part 2: IP Header
+Part 3: Address Resolution Protocol (ARP)
+                 Direct Routes and Indirect Routes
+                 Network Routes and Subnet Routes
+                 Multiplexing and Demultiplexing
+ 
+Slide 3:
+Part 1 of IP Layer. 
+The Purpose of the IP Later is to:
+Provide a common network interface addressing scheme (IP address). This means that each host in a TCPIP network segment will have each own unique IP address or addresses if the host has multiple network interfaces (multi-homed). This IP address will be used to deliver datagrams to that host as it’s destination and will be used as it’s source address when sending datagrams.
+Deliver datagrams to directly attached interfaces. The IP layer is used to deliver datagrams to directly attached interfaces using the IP address of the destination, and process inbound datagrams based on receipt of datagrams using it’s IP address.
+Determine a next-hop router for hosts that are not directly attached. For non-directly attached network interfaces, the IP layer will need to local appropriate next hop routes to deliver datagrams /packets to these hosts. This is done by using local routing table to locate indirect routes to these non-direct hosts
+Multiplex and demultiplex datagrams. You will see that IP datagrams are actually encapsulating a higher-level protocol, like TCP or UDP, for example. This means that the IP layer is responsible for either adding or removing the IP header from these packets in order to ensure that the encapsulated protocol data is correctly processed and delivered.
+ 
+Slide 4:
+Some of the more common IP Layer Terms that you will be familiar with are:
+
+internet (little i) – This describes 2 or more connected networks LANs.
+Internet (Big I) – This describes the world-wide set of all interconnected internets.
+Intranet – This describes an internet belonging to one organization, it may or may not be connected to the Internet.
+Internet Address – A unique identification of an interface on the Internet. It is also known as an IP address.
+IP Datagram – The common unit of data exchanged on an internet. This is also known as a packet.
+ 
+Slide 5:
+
+More common IP Layer Terminology:
+IP host – Describes any computer connected to an internet and running a TCP/IP stack.
+Multi-homed host – An IP host that has more than one network interface, for example, two ethernet adapters , or 1 ethernet adapter and one Wi-Fi adapter.
+Router – A Multi-homed host that has the main responsibility of forwarding datagrams to other hosts(indirect routes).
+Network Trace –  A trace that shows IP datagrams/packets that are send and received by a particular host or hosts, for example a Sniffer trace or WireShark Trace.
+ 
+Slide 6:
+The IP address. There are currently two forms of IP addresses, IPv4 which consists of 32 bits, and IPv6 which consists of 128 bits. Our focus will be on the IPv4 IP address.
+Because the IPv4 addressing scheme uses a maximum of 32 bits, there is a maximum of 4G hosts that can be uniquely known on the internet at one time.
+The IPv6 version of IP addressing allows for many more addresses to be defined due to the larger number of bits used for the addresses.
+ 
+Slide 7:
+In the IP packet header, as mentioned, the IPv4 address is represented by a 32-bit hexadecimal value, for example:
+
+xBCFC0D21
+When displayed by an application, like netstat, the addresses are provided in a readable dotted decimal format, for example:
+
+140.252.13.33
+ 
+Slide 8:
+
+IP Datagrams/IP Packets
+
+IP Datagrams are the common unit of data exchange on an internet. Each TCP/IP host on the internet can process IP datagrams
+IP datagrams are encapsulated within Link Layer frames, for instance Ethernet. IP datagrams delivered from the IP Layer and then passed to the Link layer where they are encapsulated with the Ethernet header and delivered. Conversely, Ethernet frames received by the IP layer from the Link layer are stripped of the ethernet header to expose the IP datagram portion of the packet.
+ 
+Slide 9:
+IP Datagram continued
+An Ip Datagram includes an IP header and data but no trailer. The Data portion of the IP datagram is an encapsulated higher level protocol header like TCP UDP.
+The IPv4 header is a maximum of 20 bytes but may be as many as 60 depending on options if included.
+Next, we’ll look at the IP header and discuss the fields it contains and their function.
+ 
+Slide 10:
+
+Continue your learning in Unit 4: IP Layer Part 3
+ 
+Unit 4: IP Layer – Part II
+                  IP Header
+ 
+Slide 1:
+We will continue with IP layer Part 2, The IP Header.
+ 
+Slide 2:
+The Internet Protocol (IP) header. These are the fields that make up the IPv4 Header. We will only be discussing the orange highlighted fields, which are version, header length, total length. Identification (IpId), flags, fragment offset, Time to Live (TTL), protocol source IP address and destination IP address.
+Of note, the DATA portion of the IP Header is mainly used for upper-level protocol header, for example TCP or UDP, etc.
+ 
+Slide 3:
+IP version and length Fields. This is a 4-bit field. For IPv4 IP Headers, the version field will always be 4.
+The header length is also a 4-bit field, which is the number of 32-bit words that are included in the header. For the most part, this field will always contain a 5, which indicates that the header is 20 bytes long made up of five 32-bit words! The only time this will be different is when any IP options are included at the end of the header, but this is not a usual occurrence!
+This makes for identifying the start of an IP header in storage or in a raw trace as it will contain a 45 as indicated, the 4, which represents the version (ipv4, and the 5, which represents the number of 32-bit words that make up the header!
+ 
+Slide 4:
+The IP header total length field. This is a 16-bit (2 byte) field which is the total length of the IP header which, which includes the IP header length, 20 bytes), and any protocol header lengths (protocol header lengths will be discussed), plus any application data sent or received from a socket-based application.
+In this example, the IP header has a total length of hexadecimal 001F or 31 decimal bytes, which indicates that there is an additional 11 decimal bytes of data represented by protocol header and any application data.
+ 
+Slide 5:
+The IP Header Identification field (IPId). This is a 16-bit (2 byte) field that is a uniquely generated value for each packet that is sent by a TCP/IP host.
+The ID field can be used for debugging purposes to flow the flow of packet(s) from one host to another if multiple network trace collection was done at various points in the network. Many times, this IPID remains unchanged even if packets flow through network Firewalls or NAT (Network Address Translation) boxes. And will not be changed by any routers that are used to forward packets.
+The ID value for the packet shown in this example is x81D2.
+
+
+Slide 6:
+The IP header flags, and fragment offset fields. The flags field is 3-bits made up of the following:
+
+x…   Reserved bit
+.x.. Don’t Fragment Bit
+..x. More Fragments
+
+The remaining 13-bits of the 2-byte field, is the fragment offset. This contains the offset, in 8-byte units, of the fragment from the beginning of the original datagram. This field will only be valid if the “More Fragments” flag bit is on.
+In the example provided there is no fragmentation occurring as none of the 3 flags bits are on!
+The next three slides will discuss fragmentation in more detail for a better understanding. 
+ 
+Slide 7:
+Explaining Fragmentation and Reassembly. As we learned in the link layer, an interface can only send or receive datagrams/packets based on its MTU (maximum Transmission Unit) size.
+An IP Datagram may be larger that an interfaces MTU, due to network topologies, like routers etc. Because of this IP Packet fragmentation and reassembly may need to occur on a receiving TCP/IP IP layer in order to process packet(s) that are larger than its MTU.
+ 
+Slide 8:
+Here is a pictorial representation of fragmentation and reassembly. As noted, fragmentation only occurs when packets are sent from one host to another, while the reassembly of the IP fragments is done at the receiving host to ensure that the original data has been properly received as it was sent from the originating host.
+
+
+Slide 9:
+Fragmentation and reassembly in more detail.
+In this scenario, the HOST, identified as HOST_A has a next hop route of HOST_B to get the final destination of HOST_D. This next hop route has an MTU of 8992 (ethernet jumbo frame). HOST_B then has a next hop of HOST_C in order to Route the packet destined for HOST_D, which has an MTU of 1500 (normal Ethernet). Finally, HOST_C, which is the final route to HOST_D, has an MTU of 8992 for its route to HOST_D.
+HOST_A sends a data packet of 5100 bytes to HOST_D. This packet can be successfully sent from Host_A to HOST_B using the 8992 MTU interface as a single datagram. Notice that the 5100 bytes of data had been encapsulated in an IP header with an IP length of 5140 bytes this includes the 5100 bytes of application data, the 20-byte IP header and 20-byte TCP header. The IP header for this packet, sent from HOST_A, will have an IP ID of 345 assigned to it.
+Note that the packet sent from Host_A does not have the Don’t fragment flag on, which allows an intermediate host to do fragmentation. Otherwise, packets with DF would be dropped by the host that needs to fragment. A packet with an IP length of 5140 bytes will reach HOST_B, destined for HOST_D. Because the next hop route from HOSTB, which is HOST_C, only has a 1500-byte MTU, the packet can’t be sent to HOST_C by HOST_B, unless it is fragmented as it was aware that the route it had to HOST_C was not capable of handling packets greater than 1500 bytes!   So, HOST_B will turn on the more fragment flag (MF) and break the 5140-byte single packet from HOST_A into 4 packets, three with an IP length of 1500 and the fourth with an IP length of 700 bytes. Notice that the first 1500-byte packet has the (MF) flag on as well as the IP ID from the original 5140-byte packet from HOST_A, which is 345. The next two packets with IP length of 1500 bytes, also have the same IPID, as well as the (MF) flag on, but each has different fragment offset values. The fourth and final fragment has the same IPID, but has turned off MF, but has a fragment offset representing the last piece of the application data. Notice how the fragment offset values are multiplied by 8 to calculate where the actual data will be in each of the packets, this as well as the IPID value will be used at the destination of the packet, HOST_D to reassemble these four packets. Also, note that even though HOST_C has 8992 MTU route to HOST_D, the fragmented packets are still sent to HOST_D. This allows the original data of 5100 bytes to be received/reassembled and presented to the application correctly on HOST_D.  
+This depicts how the fragmentation is done at the sender of the packet, in this case an intermediate router, while reassembly done at the receiving host, HOST_D in this case.
+Note, that fragmentation/reassembly is meant to be transparent, but there are cases where performance issue may arise due to it, for instance fragments arriving out of order at the receiver, or delays on the receiver in reassembling are two examples.
+Also, note that a firewall between any of these hosts, MAY, throw some of the fragments without protocol headers away causing packet loss
+ 
+Slide 10:
+IP header time to live (TTL) is an 8-bit (1 byte) field that sets an upper limit on the number of hops a datagram can travel towards its destination.
+The TTL is initialized by the sender using a configurable value and is decremented by one each tie the datagram passes through a router to get to the destination. When the TTL value reaches zero, the packet is dropped!
+Included at the bottom are some of the known default values for TTL for certain platform TCPIP stacks. TCPIP on IBM z/OS Communications Server uses a default TTL of x40 (64 decimal), z/VM is x3C (60 decimal), etc.
+
+
+Slide 11:
+IP header Protocol is an 8-bit (1 byte) field representing the protocol header that is encapsulated in the IP header. The two most common protocol types are 06 for TCP and 11 for UDP. Others protocol types were also included for reference.
+ 
+Slide 12:
+IP header source and destination IP address. Each of these fields is 32-bits (4 bytes in length). They each represent the sender’s and receiver IP address in hexadecimal format. In the example provided, the sender IP address is xc0a8011a’ (192.168.1.26 in the more familiar IPv4 dotted decimal format, and the destination IP is xC23CB509 (194.60.181.9 dotted decimal).
+Please note that IP addresses come in three classes, which are A-C, and a special case class D, which is  reserved for Multicasting
+
+Class A addresses are in the range of: 1.x.x.x – 126.x.x.x.
+Class B addresses are in the range of 128.x.x.x – 191.x.x.x
+Class C addresses are in the range of 192.x.x.x – 223.x.x.x
+ 
+Slide 13:
+You can now understand how fields in the IP Header can be used for fragmentation and reassembly, Routing and multiplexing/demultiplexing of encapsulated protocols, like TCP or UDP.
+ 
+Slide 14:
+IP routing comes in two basic forms direct or indirect. If the source and destination interface are on the same physical network, the route between these types of hosts is said to be direct. This means that there is no intermediate router needed to deliver packets between the hosts.
+Otherwise, if a route in consider indirect, then an intermediate router or routers are needed to deliver the packets.
+ 
+Slide 15:
+This concludes IP Layer Part 2. We will continue with IP Layer Part 3.
+ 
+
+
+Unit 5: IP Layer – Part III
+ 
+Slide 1:
+Let’s continue with IP Layer Part 3.
+ 
+Slide 2:
+IP layer review
+We have discussed IP address and IP datagram delivery in Part 1.
+We have broken down the important fields in the IP header in Part 2.
+In Part 3, we will be discussing Address resolution Protocol (ARP), direct & Indirect routes, Network & Subnet Routes, and Multiplexing & Demultiplexing IP packets.
+ 
+Slide 3:
+Direct routing and ARP
+This brings us to the Address Resolution Protocol (ARP). ARP is considered part of the Link layer, but it is convenient to discuss now.
+If the route to a destination is direct, then all that needs to be figured out is hardware address (Mac address) of the destination host and the datagram can be sent out.
+ARP is used to map the IP address to the hardware address (MAC) for directly attached hosts. ARP is only done if an interface supports broadcast.
+In z/OS Communications Server (CommServer), ARP processing is done by the OSA device when configured in QDIO mode.
+ 
+Slide 4:
+In order to learn the destination hardware address associated with the destination IP address, a link layer broadcast is sent asking for this information.
+This broadcast is called an ARP request. It is broadcast to ALL locally attached network hosts, expecting an ARP reply. Basically, the ARP broadcast is sent asking all devices if they are the owner of IP address xyz, if they are, please send back your hardware address in a link layer ARP reply. These ARP frames are not IP based; they are ethernet frames. This ARP level routing is also referred to as Layer2 routing, where ARPs are used to learn destinations versus IP routing tables, which is referred to as Layer3.
+Note that the IP to MAC Mapping created by ARP processing is cached in each of the hosts that send and responded to the prior ARP request. This allows the subsequent ARPing to be completed very quickly without the need of sending ARP broadcasts for the same address each time while still kept in the ARP cache.
+ 
+Slide 5:
+Indirect Routing
+If the destination host is not on the same physical network, the datagram must be sent to am intermediate host. There may be several intermediate hosts on the path between the source and destination. Each of these paths or hops is called the next-hop router.
+Note that ARP is also used in Indirect routing, where the sending host needs to obtain the mac address of the next-hop router in order to forward datagrams to it!
+ 
+Slide 6:
+Indirect routing continued.  For the most part, Ip routing is done on an internet in a hop-by-hop basis. This means that the sender does not generally know all the hops between it and the destination. It would only know it’s next hop as the first hop in order to get to the destination.
+There are methods for the sender to influence what intermediate hosts are traversed, but that is not covered in this education.
+Note that most TCPIP implementations provide a tool named tracerte (traceroute) that can be used to see all the hops between a sender and destination
+ 
+Slide 7:
+Netstat route Output. This is netstat route output from a zOS TCPIP stack that shows the IP routing table and how specific IP addresses, or IP subnets can be reached and whether they are direct or indirect routes. The IP routing table is used by the IP layer to decide how a datagram can be delivered. All TCPIP platforms have a method of displaying the IP routing table.
+Host vs network/subnet Routes
+Notice the destination address of 9.42.104.149/32, this notation is used to create subnets. In this example, the /32 indicates that ALL 32 bits of the IP address of a destination are checked against the mask bits. In this case, the entire IP address would be checked as /32 is coded. So, if a packet is sent to 9.42.104.149, it would find this route, which is deemed as a host route in netstat (flag H is set) and the next hop of 9.42.105.126 would be used to send the datagram to that destination. This / style is also used for subnet routes, a subnet route is coded as 9.42.104.0/25 in the above example. So, this means that if a destination falls within the 25 bits that are checked and compared to the destination address then the gateway/next-hop configured would be used, other a default route would be used instead if configured.
+ 
+ 
+Slide 8:
+Direct vs Indirect Routes. When a route is considered direct, the destination IP address and the destination hardware address are associated with the final destination host!
+When a route is considered indirect, the destination IP address indicates the final destination, but the destination hardware address indicates the next hop!
+ 
+Slide 9:
+Multiplexing and Demultiplexing. This is the last feature of the IP layer that will be covered.
+When an IP datagram is received in the IP layer of a TCPIP stack, it needs to be Demultiplexed. This means that the protocol field in the IP header will be read so that the packet can be delivered to the appropriate upper layer protocol. In this example TCP or UDP.
+Conversely, when a datagram is sent to the IP layer from an upper layer protocol, for example TCP(6) or UDP(11), the protocol of that packet needs to be added to the protocol field in the IP header before it is passed to the Link or interface layer to be sent to the destination
+ 
+Slide 10:
+This concludes the IP layer education. We’ve learned that the IP layer provides a network device addressing scheme in the form of IP addresses and uses these addresses to route datagrams using an IP routing table.
+Multiplexes and Demultiplexes datagrams to ensure that the correct protocol payloads are processed.
+ 
+
+Slide 11:
+
+Thanks for your time. We will provide more education in a future course.

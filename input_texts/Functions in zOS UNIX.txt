@@ -1,0 +1,220 @@
+Functions in z/OS UNIX
+
+Functions and processes:
+In this module we're going to discuss UNIX processes along with program execution, pipes, and threads.
+Let's start by asking what are the functions and interfaces for z/OS UNIX System Services? The XPG4.2 API is defined in a set of standards from the Open Group.
+This API defines some general operating system functions as well as some functions that are specific to a UNIX system.
+Programs which conform to XPG4.2 UNIX are fully supported by the UNIX System Services (USS) API.
+The XPG4.2 functions are defined in terms of C language bindings.
+When a z/OS UNIX program requests a system service, the following events take place.
+First the application programmer codes a C language statement with a function request, for example, fork().
+Fork() requests that a new process be created.  During compilation of the program, a section of code called a stub is included in the compiled module.
+When the program is run, the stub identifies the run time library (RTL) routine corresponding to the fork() function and passes control to this routine.  For some functions, the service can be performed by the library routine itself.
+For others, such as fork(), the library routine includes a CALL macro instruction that selects the appropriate callable service to request by name.
+The callable service named BPX1FRK in turn calls the appropriate z/OS service function.
+And finally, the z/OS UNIX kernel performs the requested service.
+The XPG4.2 kernel is a z/OS address space which is started at IPL time and initialized with system parameters in a SYS1.PARMLIB member.
+All files are allocated to the kernel, and all I/O operations result in calls to the kernel.
+Interactive users of z/OS UNIX services can log on to TSO/E and issue the command OMVS.
+The OMVS command schedules a local process, fpr, which shares the TSO address space.
+Additional address spaces can be created by shell commands.
+The Workload Manager (WLM) is used to start these address spaces.
+Users attached to z/OS through a TCP/IP network can use the rlogin or Telnet capability to enter the z/OS system.
+Their identity is checked, and a shell address space is created for them.
+Additional address spaces can be created for them by the Workload Manager (WLM) for their shell commands.
+z/OS provides support to allow an installation to re-customize and reinitialize the z/OS USS environment without re-IPLing the system.
+The F OMVS,SHUTDOWN operator command along with the F OMVS,RESTART operator command can be used to shut down and then reinitialize the USS environment.
+A process is created to run a program and associate resources to the program.
+In z/OS UNIX, a process resides in an address space and is the basic unit of work that runs within that address space.
+A process is created by another process or by a request for a z/OS UNIX service.
+A process that creates a new process is called a parent process, and the new process is called a child process.
+A child process can be created by the fork() callable service.
+A process is identified by a process ID (PID), and it is associated with its parent process by a parent process ID (PPID).
+There are different types of processes.
+User processes are associated with a user program or shell user.
+Kernel processes perform system functions for the kernel.
+And daemon processes perform continuous or periodic system functions.
+To get information about z/OS UNIX processes, the shell command ps can be used.
+A z/OS UNIX user can use this command to display information about all their active processes.
+A superuser can display information about all the processes in the system by using the command ps -A.
+ps is a very useful command when finding processes and handling them.
+D OMVS,ASID=nnn or A=nnn displays process information for the specified hexadecimal address space ID (ASID).
+If the specified ASID is not a z/OS UNIX System Services address space, an error message is issued.
+The operator can display the status of a particular OMVS process and its threads with the following command: D OMVS,PID=[process id].
+This shows information about each thread of a multithreaded application.
+The thread ID would be needed to cancel an individual thread.
+There are several ways to stop a z/OS UNIX process.
+One option is the operator MODIFY command.
+The TERM option allows a signal interface routine to receive control before termination.
+The FORCE option prevents the signal interface routine from receiving control before the process is terminated.
+A special option, SHUTDOWN=FORKINIT can be used to bring down the system cleanly.
+Be aware: It cancels all current BPXAS address spaces created as a result of spawn() or fork().
+The kill shell command can be used to cancel a process.
+A user can cancel their own processes, and a system administrator (superuser) has authority to kill other user's processes.
+TERM sends a SIGTERM signal and KILL sends a SIGKILL signal.
+And the z/OS CANCEL command can be used to cancel an address space that contains a z/OS UNIX process.
+If the address space contains multiple processes, CANCEL causes all of them to terminate.
+UNIX Systems Services processes is new with z/OS Release 2.
+Type PS to access the Processes panel which allows authorized users to display information about z/OS UNIX processes.
+You can then use the command C to Cancel the process and D to Display information about processes.
+Use PRE (prefix) or other filters to limit the rows displayed to some processes.
+Use ARR (arrange) to place interesting columns on the first panel.
+Sort on JobName to keep rows from jumping around.
+Next up we're going to ask - what is a daemon?
+
+Daemons and SuperUsers:
+What is a daemon? A supernatural being? A person with unusual drive? Well yes and yes, but in the context of UNIX a daemon is a long-running background process that listens for requests and performs service when needed.
+It is similar to a z/OS started task.
+In Greek mythology, daemons were helpers, hence, the name of these processes in UNIX.
+z/OS UNIX has several system daemons.
+inetd is the listener program which receives incoming logins.
+It now provides support for IPv6.
+rlogin and otelnetd are the daemons started for each user by inetd depending on the client program used to request login.
+The cron daemon is a time daemon.
+It starts requests at specific times from input stored in specific files.
+And rexecd is a daemon that receives requests from remote clients for execution of a command under the z/OS UNIX shell.
+As you know by now, there are two categories of z/OS UNIX shell users, superuser and user.
+The superuser has special authority to perform certain tasks, such as mounting and unmounting a file system.
+The superuser can also access all z/OS UNIX services and all files in the hierarchical file system.
+z/OS UNIX users have a numerical user identifier.
+The superuser has a UID=0, while all other users have UIDs between 1 and 2 billion.
+z/OS UNIX users are z/OS users defined to RACF with an OMVS segment containing their UID (user identification number), HOME (user's initial working directory in the HFS), and PROGRAM (the program path name for the shell).
+These users may or may not have TSO/E privileges.
+All users should have a unique UID, although multiple users with the same UID are supported.
+Superusers should have their own standard UID, and then they can switch into superuser status when they need to perform authorized functions.
+z/OS UNIX users belong to groups similar to z/OS groups in RACF.
+The z/OS groups defined in RACF can be defined as z/OS UNIX groups by adding a group identifier number (GID).
+The su shell command allows a user to change the user ID associated with a session.
+su starts a new shell and lets the user operate in it with the privileges of a superuser or another user.
+If no user ID is specified on the command, su changes the user's authorization to that of the superuser.
+If a user ID is specified, su changes the user's authorization to that of the specified user ID.
+The new environment is built, and then a new session is initiated.
+The new session is run as a child shell of the shell issuing the su command.
+There are different methods that can be employed to switch to superuser.
+Using the su command creates a subshell where the user has superuser authority and authorized commands can be executed.
+When the subshell session is ended, the user returns to the first shell session as a regular user.
+The su command, along with the BPX.SUPERUSER RACF facility class, allows an installation to define system administrators in RACF with non-zero UIDs.
+The superuser concept in standard UNIX is more or less “all or nothing” in relation to security and special authority; however, by using the RACF BPX facility classes, you can better control what users can and cannot do.
+Also, a RACF UNIXPRIV CLASS exists, making it possible to establish better granularity for some special authorizations.
+By defining profiles in the UNIXPRIV class, you may specifically grant certain superuser privileges with a high degree of granularity to users who do not have superuser authority.
+This allows you to minimize the number of assignments of superuser authority at your installation and reduces your security risk.
+So, we've seen something about special privileges and authority related to different users.
+In the next video we'll return to talking about processes.
+
+Child Processes:
+Fork() is an XPG4.2 function which creates a duplicate process referred to as a child process.
+The process that issues the fork() is referred to as the parent process.
+A parent process can create multiple child processes.
+With z/OS UNIX, a program that issues a fork() creates a new address space, which is a copy of the address space where the program is running.
+The fork function does a program call to the kernel which uses Workload Manager to create the child process.
+The contents of the parent address space are then copied to the child address space.
+After the fork() function, the code in the child address space is at the same address as the parent address space.
+Control is returned to both programs at the same point.
+The only difference that the application sees is the return code from the fork() function.
+A return code of zero is returned to the child after a successful fork().
+All other return codes are valid only for the parent.
+A process can also be created when a non-z/OS UNIX program requests a z/OS UNIX service, for example, an open of a file in the hierarchical file system from an assembler program.
+This address space is dubbed as a z/OS UNIX process.
+The dub does not result in a new address space being created.
+The child address space is almost an identical copy of the parent address space.
+User data, for example, private subpools, and system data, like RTM (recovery termination management) control blocks, are identical.
+HFS files are allocated to the kernel, and I/O is done by calling the kernel.
+On a fork(), all open files are inherited by the child address space.
+z/OS data sets are allocated to an individual address space.
+After a fork(), the child address space does not have access to the z/OS data sets allocated by the parent.
+Through system definitions, there is a way to improve the performance of fork() calls.
+The option allows the parent and child processes to share a copy of the storage areas until they are modified.
+When the area is modified, it is copied to the child process.
+If this option is off, the system creates a copy of all storage areas at the time of the fork() for the child process.
+The XPG4.2 standard defines a family of exec function calls.
+The exec functions are used to start execution of a new program.
+The difference between the exec functions is the way the name of the program and the parameters (arguments) are passed.
+When a program issues an exec system call, the program as well as all data in that address space is destroyed.
+The new program is loaded from the file system and given control.
+The only information the new program has access to is the arguments passed on the exec call.
+The fork() and exec() functions are usually used together in a sequence.
+First, a process issues the fork() to create a child process.
+The result is two almost identical processes which run the same program (say Program A).
+An important difference between the processes is the return code from the fork.
+Only the child process receives a return code of zero after a successful fork.
+This can be used as a way of starting a new program.
+Program A issues an exec to start a new program, Program C, if the return code is zero.
+In this case the child has a zero return code and Program C is started.
+The parent gets a return code different from zero from the fork, and it continues to run Program A.
+The result is that the parent process runs the old program (Program A) while the child process runs the new program (Program C).
+The two processes are related and can share data and information between them.
+In order to enable multiprocess applications to run on z/OS UNIX without the address space resource overhead, z/OS UNIX provides services that allow multiple processes within one address space.
+These types of processes are called local processes.
+The child process is called a local child process.
+The local child process has the same attributes as a child process after a fork and exec.
+There is a set dub default service which provides the ability for a z/OS task to attach a new subtask that runs as a new process.
+This new process is called a non-forked local process.
+The spawn() function implements local processes.
+It also combines the fork and exec into one call.
+It extends the support for local processes to the standard family of C services.
+If the environment variable _BPX_SHAREAS is set to YES, the parent and child processes created by a spawn() share the same address space.
+If this environment variable is set to NO, each process runs in its own address space as in a fork().
+In the next video we'll talk about a communication for sending data between processes.
+
+Communication and Threads:
+In z/OS UNIX, pipes are a communication mechanism for sending arrays of data between two processes.
+Pipes are, conceptually, like a sequential file.
+Processes can write into a pipe, and other processes can read from the pipe.
+Pipes exist only during the time they are open.
+The storage needed for the pipes is obtained from a data space associated with the kernel address space.
+There are two types of pipes.
+Unnamed pipes are used between related processes, for example, between a parent and child process.
+An unnamed pipe is created by the pipe() function.
+The pipe function also opens the pipe for use.
+No security checking is performed on unnamed pipes since they are available only to a process and its children.
+There's also named pipes are also called FIFO.
+A FIFO resides in the hierarchical file system and can be referred to by a name.
+Thus, they can be used for communication between any two processes.
+Once processes are created, there are many ways to communicate between them.
+We have already talked about pipes being the most common way.
+Other ways include Wait and exit: A parent process can wait on the exit of a child.
+Signals: One process can send a system or user signal to another.
+The receiving process should be coded to receive and process the signal.
+Shared memory: Since processes run in different address spaces, these services can be used to define specific memory to be shared.
+The kernel will keep these pages in a shared data space.
+Message queues: This is a technique similar to piping but with the capability of reading and writing a message at a time rather than a string of characters.
+The kernel also uses a shared data space for these messages.
+And Semaphores: which are used to control the use of shared memory by multiple processes.
+They are kept in the kernel process.
+The z/OS UNIX Interprocess Communication (IPC) functions are shared memory, message queues, and semaphores.
+Users can invoke applications that create IPC resources and wait for IPC resources.
+IPC resources are not released when a process terminates, or a user logs off.
+Therefore, it is possible that an IPC user might need assistance to remove an IPC resource using the shell's ipcrm command.
+The ipcs shell command can be used to display the IPC resources in a system, which users own the resources, and which users are waiting for a resource.
+Frequently used z/OS UNIX programs can be placed in the z/OS link pack area (LPA) to improve performance.
+The shell is a good candidate because only one copy of it can be used by all requestors, saving space and I/O.
+When searching for a program with the sticky bit on, z/OS UNIX will look in the user's STEPLIB, the link pack area, and the link list concatenation.
+In order to keep a z/OS UNIX program in LPA, a number of things must be done.  The file in the hierarchical file system that contains the program must have the sticky bit set by an authorized user.
+The sticky bit can also be set on a directory level.
+It limits removing or renaming subdirectories or files to the owner or the superuser.
+Also, the program must be link edited and placed in SYS1.LPALIB or a data set in the LPALIST.
+The program is copied to LPA during the next IPL.
+Threads provide support for multiple separate units of dispatchable work within a process.
+A z/OS UNIX thread can be compared with a z/OS task.
+The thread support allows application programmers to develop multitasking server applications that require multiple concurrent execution streams.
+A program using threads can have significant performance benefits in a multiprocessor environment where each thread in a process can run on an individual processor.
+Threads are created with the pthread_create() C function.
+Since threads share address space, there are services to protect the memory of the address space and to synchronize the execution of the threads.
+These are Mutex which is a structure associated with a variable and used by threads to determine if a variable is in use.
+And condition variable -- used to synchronize the execution of the activities of the threads.
+So, what are some of the differences between z/OS tasks and POSIX threads? z/OS has a task hierarchy.
+POSIX threads have no hierarchy except for the initial thread which behaves differently from the other threads.
+z/OS tasks usually run different programs.
+All POSIX threads in a process run the same program.
+z/OS tasks can be independent or cooperating.
+POSIX threads must cooperate; they do not operate independently.
+z/OS allocates storage at task level, and some storage can be shared between tasks and some not.
+The programs can be located in common storage (CSA or LPA), in private area below the 16 MB line, or in private area above the 16 MB line.
+All POSIX threads in a process share all storage allocated to the process.
+This diagram shows the z/OS program management functions and the equivalent functions in z/OS UNIX.
+Some of the similarities include that programs can reside in different libraries, and there is an automatic search to locate them.
+Both interfaces provide a method to replace the current executing program with a new program.
+And both sets of interfaces have ways to create work in separate address spaces.
+But there are also many differences including with tasks, LOAD, and program execution.
+And that's it for z/OS UNIX functions.
+In the next module we'll look at working with the z/OS UNIX environment.

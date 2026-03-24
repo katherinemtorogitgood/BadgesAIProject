@@ -1,0 +1,541 @@
+Hierarchical file system intro:
+There's a lot to cover here so we've broken this up into multiple sections.
+Stick with me.
+Once we've established these file system fundamentals we can really move on to the fun stuff of utilities, commands, and functions.
+Let's get started.
+The z/OS UNIX file system is hierarchical in structure in the same way as a UNIX file system.
+All files are  members of a directory, and each directory is in turn a member of another directory at a higher level in the hierarchy.
+The highest level in the hierarchy is called the root directory.
+A file in the hierarchical file system is called an HFS file.
+HFS files are byte-oriented and there is no concept of a record structure.
+A file system is contained in a z/OS data set type called a hierarchical file system (HFS) data set.
+z/OS views an entire file system hierarchy as a collection of HFS data sets and zFS data sets.
+Each HFS data set is a mountable file system.
+Connecting one file system to another is called mounting.
+HFS data sets and zFS data sets can be mounted onto each other in a hierarchy.
+The root file system is the first file system mounted.
+Subsequent file systems can be mounted on any directory within the root file system or on a directory within any mounted file system.
+The place within a file system where another file system is mounted is called a mount point.
+A file system can be mounted only in one place at a time.
+The mount command is used to mount a file system and unmount is used for disconnecting a file system from the file system hierarchy.
+Mount and unmount are authorized commands.
+The root file system is the starting point of the overall file system.
+It consists of the root directory (/) and related directories and files.
+The system programmer defines the root file system.
+The root file system usually contains system related files and files that belong to a program product.
+The root file system should be kept as non-volatile as possible.
+It can be unmounted and remounted, but this activity should be kept to a minimum.
+User files are often located in other mountable file systems.
+Altogether, the root file system and mountable file systems contain the file systems used by shell users and applications.
+There is a temporary file system (TFS) which can be mounted at /tmp.
+This file system type avoids physical I/O since all files in it are kept in memory; such files are not kept permanently.
+Because of its temporary nature and use of memory instead of I/O, /tmp is a good option for user and system temporary files.
+The set of names required to specify a particular file in a hierarchy of directories is called the path to the file.
+The path is specified as a path name.
+A path name can be absolute or relative.
+An absolute path name is a sequence which begins with a slash for the root, followed by one or more directories, and ends with the file name.
+A relative path name is a path name which is relative to the working directory.
+A relative path name does not start with a slash.
+A path name can be up to 1023 characters long including all directory names, separating slashes, and the file name itself.
+A file name can be up to 255 characters long and can consist of uppercase and lowercase letters.
+z/OS UNIX is case sensitive so watch out for that.
+File names can include extensions which identify the contents of a file, for example, proga.c and name.lst.
+Next up we'll turn our attention to file types.
+
+File types:
+The hierarchical file system contains the following types of files: Directories, Regular files, Named pipes (or FIFO), Character special files, and Symbolic links. Users and programs create directories, regular files, pipes, and symbolic links.
+And a system programmer creates character special files.
+Let's look at each in turn.
+A directory is a file, just like everything else, but it's a special kind of file.
+It consists of the names of a set of files and other information about them.
+Usually, the files in a directory are related to each other in some way.
+And of course, a directory can have subdirectories.
+A z/OS UNIX user has a directory defined as its home directory.
+After logon, the home directory becomes the working directory.
+A regular file is a named unit of text or binary data information.
+A file can, for example, be C source code, a list of names or places, a printer formatted document, a string of numbers organized in a certain way, an employee record, or a memo.
+A user or application must understand how to access and use the individual increments of data within a file.
+When the sticky bit is set on for a directory, only the superuser or owner can delete or remove a file in the directory.
+When the sticky bit is set on for an executable program, z/OS UNIX looks for that program in the user's STEPLIB, the link pack area, or the link list concatenation.
+This is done to reduce I/O and improve performance of frequently used programs.
+A named pipe is also called a first-in-first-out (FIFO) special file.
+A FIFO is a file typically used to send data from one process to another so that the receiving process reads the data in a first-in-first-out order.
+Named pipes are created by the mkfifo() function or by JCL.
+This results in a directory entry for the FIFO being created in the file system.
+Named pipes have to be opened and closed by all processes that are using them.
+Named pipes can be used between independent processes or by parent and child processes.
+A character special file is located in the /dev directory in the root file system.
+It is a file that defines a number of things.
+There's a system console file (/dev/console or /dev/operlog) - used to direct data to the system console or the operlog facility of z/OS.
+A null file (/dev/null) is equivalent to a z/OS DUMMY file.
+/dev/zero is a character special device file.
+Data written to this file is discarded, and data read from this file is in the form of binary zeros.
+There's /dev/random which is a device file that produces random bytes.
+A file descriptor file (for example, /dev/fdn) - used to create a duplicate of an open descriptor.
+A terminal file (/dev/ptypnnnn and /dev/ttypnnnn where nnnn is a number) - used to represent a hardware device such as a terminal or a workstation.
+These files (pseudo-TTY) are built in pairs and the system selects a pair of these files to represent a connection between a user and the system.
+And finally, the terminal file (/dev/tty) which is the default controlling terminal for a process.
+A symbolic link is a file that contains the path name for another file, in essence, a reference to another file.
+It's somewhat comparable to a z/OS ALIAS.
+A symbolic link can be created for a file or a directory.
+A symbolic link can refer to files in another file system.
+And a  symbolic link is created by the symlink() function.
+A symbolic link can be used when a file is moved to a new directory, and you want users to access the file with the old name.
+Also, it can be used to create an alias short path name for a file that has a long path name.
+A hard link is a bit different from a symbolic link it that it's a new name for an existing file.
+A hard link is a new entry in a directory that has the same inode as the original data.
+A hard link can only point to a file in the same file system.
+It cannot point to a directory or across file systems.
+It is created with a link() function.
+An external link is a variation of a symbolic link.
+An external link is a type of symbolic link which points to a z/OS data set.
+It can only be used by the network file system, the exec family of functions, and to point to dynamic link libraries located in z/OS data sets.
+The -e option on the ln command creates an external link.
+They can also be created through the ISHELL.
+A shell user cannot browse data in a z/OS data set through a external link.
+They can only create, delete, or look at the external link's attributes.
+We have mentioned file name, symbolic link, hard link, and file descriptors which are all used for referencing a file.
+Let's look at an overview of all these file identifiers.
+A file can be identified by, of course, file and path name.
+Each file has a unique identification number called an inode number.
+The inode number refers to a physical file on DASD where the data is stored in a particular location.
+The inode number is kept in the directory together with the file name.
+A symbolic link is a separate physical file with a pointer to another physical file.
+The two files have different inode numbers, and they can reside in different file systems.
+A hard link is a new name for an existing file.
+A hard link is a new entry in a directory with the same inode number as the existing file.
+Hard links cannot point to data across file systems.
+And finally, a file descriptor is a number that represents an open file.
+It is used to access files in C language programs.
+When a program opens a file, the system returns a file descriptor for it.
+Okay, so that's file systems.
+Next up HFS and zFS data sets.
+
+HFS and zFS data set fundamentals:
+A hierarchical file system can be in a data set type called HFS or can be in a zFS data set.
+HFS data sets can span many DASD volumes.
+If spanned, they must be SMS managed.
+z/FS and HFS are both UNIX file systems and both can participate in shared sysplexes; however, while HFS always has a single file system per data set, zFS can have multiple file systems in a single data set.
+These data sets are called aggregates and are a collection of data sets.
+HFS data sets are like PDSE data sets.
+They are allocated like any other z/OS data set.
+Although an HFS data set is a z/OS data set, an MVS OPEN request fails.
+Users must use UNIX System Services to access data in such a data set.
+The hierarchical file system (HFS) consists of one root file system and multiple user file systems.
+The root file system is the base for HFS and is at the top of the hierarchy.
+HFS data sets are allocated as z/OS data sets, so DSNTYPE=HFS.
+HFS data sets can only be opened by UNIX System Services kernel operations.
+HFS data sets can reside on the same volumes as other z/OS data sets.
+Non-SMS managed HFS data sets are often used.
+A few other characteristics.
+The size of the data set is limited to 2 GB if single volume.
+A multi-volume HFS can span up to a maximum of 59 volumes.
+HFS can have up to a maximum of 123 extents per volume.
+And a multivolume HFS can have up to a maximum of 255 total extents for all volumes.
+Also keep in mind that within a file system in HFS there is no way to control the amount of space each user can use.
+It is possible for one user to use the entire space in a file system.
+So, the recommendation is that each user have their own file system.
+A zFS aggregate is a VSAM Linear Data Set (LDS) that contains one or more zFS file systems.
+The name of the aggregate is its VSAM LDS name.
+A zFS file system is a logical named entity contained within a zFS aggregate that has a root directory and can be mounted.
+It has a logical maximum size known as its quota.
+A zFS file system is a named entity that resides in a zFS aggregate.
+It contains a root directory and can be mounted into the USS hierarchy.
+File system is not really a new term but a zFS file system resides in a zFS aggregate, which is different from an HFS file system.
+So, the data set that contains zFS file systems is called a zFS aggregate.
+A zFS aggregate can contain one or more zFS file systems.
+A zFS aggregate that contains only a single zFS file system can be defined and is called a compatibility mode aggregate.
+For compatibility mode aggregate the VSAM LDS name = the zFS aggregate name = the zFS file system name.
+The quota of these file systems is set to the size of the aggregate.
+A compatibility mode aggregate can contain only one zFS file system, making this type of aggregate more like an HFS file system.
+This is flagged in the aggregate when it is created.
+Version file systems in a shared file system that are no longer being used can be automatically unmounted.
+Also note that multi-file system aggregates are no longer supported by z/OS.
+A colony address space runs USS system code as an extension to the USS kernel address space.
+zFS runs as a UNIX System Services colony address space.
+There must be an entry in a BPXPRMxx parmlib member for zFS, and the zFS PROC must be available.
+The BPXPRMxx member in parmlib contains a FILESYSTYPE statement for the zFS physical file system.
+It includes an ASNAME parameter specifying the zFS PROC.
+ASNAME is required for PFSs that run in colony address spaces.
+zFS can now handle mounts of zFS file systems contained in the BPXPRMxx.
+Mount commands can be left in /etc/rc or moved into BPXPRMxx.
+zfsadm commands that query information (for example, lsfs and aggrinfo) can be issued by any user.
+zfsadm commands that modify (for example zfsadm create) require that the issuer be logged in as root.
+Now what are the advantages of zFS? zFS is a file system that is fundamentally different from HFS.
+The administration view of zFS is different from HFS.
+zFS file systems are created in a different manner from the way that HFS file systems are created.
+In general, however, the application view of zFS is the same as the application view of HFS.
+The same APIs and commands are used for zFS as are used for HFS.
+Once the zFS file system is mounted, it is almost indistinguishable from a mounted HFS file system.
+zFS is a z/OS UNIX file system that can be used in addition to the hierarchical file system.
+zFS file systems contain files and directories that can be accessed with the z/OS hierarchical file system file application programming interfaces (APIs).
+zFS file systems can be mounted into the z/OS UNIX hierarchy along with other local (or remote) file system types (for example, HFS, TFS, AUTOMNT, NFS, and so forth).
+zFS does not replace HFS, rather it is complimentary to HFS.
+And importantly, zFS is the strategic UNIX Systems Services file system for z/OS.
+In the next video we'll take a close look at using the HFS and ZFS file systems.
+
+HFS and zFS File systems:
+All right, stepped out of the office for a little bit. New surroundings.
+Let's take this opportunity for a bit of a recap.
+zFS is a physical file system like HFS.
+It is not an HFS replacement; it is complimentary.
+However, note that HFS has been functionally stabilized since z/OS 1.6, and new enhancements are only brought in the context of zFS.
+A zFS aggregate is a data set that contains the zFS file system.
+The aggregate is a VSAM linear data set (VSAM LDS) and is a container that can contain one or more zFS file systems.
+The name of the aggregate is the same as the VSAM LDS name.
+A zFS aggregate that contains only a single zFS file system can be defined and is called a compatibility mode aggregate.
+Compatibility mode aggregates are more like HFS.
+Aggregates that contain multiple file systems are called multi-file system aggregates, and this type of aggregate is no longer supported.
+OK, so you can choose whether each file system is to be an HFS or a zFS on the data set attributes panels or with the change DSNTYPE command.
+The root file system can also be a zFS.
+VSAM files and zFSs are not quite as easy to work with as HFSs.
+For example, you cannot uncatalog them and renaming them is more difficult.
+Although the HFS data set does not have to be SMS-managed, it is still highly recommended.
+Multivolume HFS data sets are only supported as SMS managed.
+(That is, you cannot have multivolume non-SMS managed data sets.).
+Finally, you do not need to migrate all your file systems to zFS at once.
+HFS and zFS can coexist, and you can migrate some or all at your own pace.
+Previously, you could only migrate mounted HFS file systems to zFS.
+Now, with z/OS 2.4, you can now use the bpxwmigf command to migrate mounted HFS file systems to zFS.
+If you expect a file system to grow larger than 4GB and it is not SMS-managed with extended addressability, you will need to copy it to an SMS-managed zFS data set with a data class that includes extended addressability.
+If a zFS aggregate is to be larger than 4GB, it must be SMS-managed with a data class that includes extended addressability.
+However, there can be non-SMS managed VSAM Linear Data Sets that are larger than 4GB, with the Extended Addressability attribute.
+Hierarchical file system data sets have partitioned organization, have the same structure as a PDSE, and might or might not be SMS managed.
+To create an HFS data set, specify the usual DD statement parameters which are necessary to create any z/OS data set.
+One way of using a file in the hierarchical file system is to refer to it by JCL.
+The following changes have been made to support hierarchical files.
+First off DSNTYPE=HFS or PIPE: Specify HFS to create a hierarchical file system data set or PIPE to specify a named pipe.
+PATH identifies a file in the hierarchical file system.
+The JCL support allows a path name to be up to 255 characters long including the slashes.
+If the path name contains lowercase letters, the name must be enclosed by single quotes.
+PATHDISP specifies the disposition of a hierarchical file after normal or abnormal end.
+It can be KEEP or DELETE.
+PATHMODE specifies the file access attributes when the file specified in the PATH parameter is created.
+The file access attributes define who has access to read, write, or execute the file.
+And PATHOPTS specifies the access and status for a file.
+There are two file options groups, the access group and the status group.
+This shows an example of how to allocate an HFS data set for the root file system.
+The important JCL keyword here is DSNTYPE=HFS.
+Note that an HFS can be either SMS or non-SMS managed but must be cataloged for the mount to succeed.
+An alternative to using JCL would be to use the TSO ALLOCATE command.
+The IOEAGFMT utility is used to format an existing VSAM LDS as a zFS aggregate.
+All zFS aggregates must be formatted before use (including HFS compatibility mode aggregates).
+IOEAGFMT does not require the zFS physical file system to be active on the system.
+Here is an example of a job to create and format a compatibility mode aggregate.
+It is a two-step job.
+The first step creates the aggregate, and the second step formats it.
+Since it is a compatibility mode aggregate, the second step also creates a file system (with the same name as the VSAM LDS cluster entry name) and sets the quota to the size of the aggregate.
+Just briefly z/OS 2.1 supports a new directory format (v5) using an extensible hashing scheme.
+You can optionally migrate to a new version 1.5 file system.
+There are multiple means to convert to the new version file system.
+There are new parameters and commands in support of zFS extended directories.
+A V5 directory can only exist in a V1.5 aggregate.
+Version 1.5 aggregates support extended V5 directories.
+Extended V5 directories  can support larger directories, store names more efficiently than v4 directories, and reclaim space when names are removed.
+A v5 directory cannot be created unless a file system is v5.
+A file system can only be converted to v5 or created as v5 by using either  IOEFSUTL convert/format or zfsadm convert.
+This JCL example shows a program in a z/OS data set being relinked to reside in the hierarchical file system.
+PATH defines the path name of the directory where the program PAYRLL resides when link edited.
+The path name is in lowercase letters and therefore enclosed by single quotes.
+We have some PATHOPTS options: OWRONLY specifies the file will be opened for write, OCREAT specifies that if the file does not exist, it is created.
+If it exists, it is reused.
+And OTRUNC specifies that the file length will be truncated to zero if the file already exists.
+And for PATHMODE, SIRWXU specifies that the file owner has read, write, and execute permission.
+SIRWXG specifies that file group has read, write, and execute permission.
+And SIRWXO specifies that all other users have read, write, and execute permission.
+Next up we're going to talk about how to get some stuff done in your Unix environment using the iShell and Directory List Utility.
+
+ISHELL and Directory List Utility:
+The ISHELL is an alternative to using shell commands.
+For a z/OS user familiar with ISPF, this can be easier to use.
+If you've completed any of the lab exercises so far you'll also be familiar with the ISHELL.
+Most of the functions that can be performed using the ISHELL are related to the file system.
+A regular user can use the ISHELL to work with directories, regular files, FIFO special files, and symbolic links.
+A system administrator can do all of this, and a good deal more including mount and unmount a file system, set up z/OS UNIX users and groups, change attributes for z/OS UNIX users, create character special files, AND set up the root file system.
+Now if you look across the top here, you'll see a number of pull-down menus and we're showing the directory menu here.
+The first option, directory list, has been enhanced to include all sorts of features such as sorting columns, using color highlighting, and executing actions based on cursor location.
+Here is the directory list.
+And it...
+are you ready for this...
+lists the files of a directory.
+Other new features of the directory list since z/OS V1.6 include wildcard support on the directory list, and an option to inherit the command line position from the previous dialog.
+Sorting is available for any column that can be displayed, even if that column is not selected for display.
+A secondary sort column can also be specified.
+This support allows you to arrange the list by file type, for example, and within file type by another attribute, such as name, date, or size.
+The highlighting enhancements allow entries in the directory list to be highlighted based on a number of different criteria.
+There are no defaults defined so  if you want to highlight entries in the directory list you must set it up to do so.
+The terminal must support colors for this feature to work.
+The use of this feature on terminals that do not support color might produce some wild and wacky arbitrary highlighting for file names.  We can set highlighting criteria for things like when the sticky bit is on, when a file is marked as executable, and so forth.
+Support has been added to ISPF for the processing of z/OS UNIX files.
+This support includes the ability to edit, browse, create, delete, rename, copy, and replace z/OS UNIX files.
+This new support is implemented as a directory list utility (known as the z/OS UNIX Directory List Utility) available as option 17 on the ISPF Utilities menu.
+This initial implementation of the directory list utility provides a subset of the functions supported by ISHELL.
+The set of functions supported by the directory list facility are aimed to assist with basic tasks undertaken by programmers.
+This utility is not aimed at users like z/OS UNIX file system administrators.
+As much as possible, the directory list utility is designed to behave and support commands similar to the data set list utility (ISPF option 3.4).
+This is done to assist users who are familiar with the operation of the data set list utility but have little experience working with z/OS UNIX files through utilities such as OMVS or ISHELL.
+When option 17 on the ISPF Utility Selection Panel (that is, ISPF option 3.17) is entered, the z/OS UNIX Directory List Utility entry panel is displayed.
+This panel supports the following options.
+Blank - to display a list of files in a directory, and P - print a list of files in a directory to the ISPF list data set.
+For either option, the user must enter in the Pathname field the path name of the directory they want to display or print.
+If a path name is not entered, the user’s home path is assumed.
+The z/OS UNIX Directory List panel is displayed when the option field is left blank and Enter is pressed on the entry panel.
+This panel lists all the files in a directory.
+The information for each entry in the directory is displayed in column fields across the screen.
+Keep in mind that the number of columns displayed depends on the available screen width.
+This example shows the initial directory list display on a terminal with a screen width of 85 and a screen depth of 31.
+Horizontal scrolling is supported using the RIGHT and LEFT primary commands (or function keys 11 and 10).
+This example  shows the directory list display after entering the command RIGHT 5 on the directory list shown on the previous screenshot.
+The order in which columns appear in the directory list display and the size of the fields can be customized using the z/OS UNIX Directory List Column Arrangement panel.
+This panel is accessed by using the pull-down menu displayed under Options on the action bar on the z/OS UNIX Directory List entry and display panels.
+Here, the user can change the order in which the columns are displayed and the width of the column fields.
+If a column field’s width is set to zero, the column is not displayed in the directory list.
+In the next video we'll discuss how to perform tasks by using the Directory List Utility panels.
+Directory List Utility Panels:
+Okay so let's look at some ways to actually get tasks done.
+One way to make things happen is to use the command line of the z/OS UNIX Directory List panel.
+You can enter commands such as EDIT  to edit a file in the directory currently listed.
+FIND will  find and display the next occurrence of a character string within the list of file names.
+RESET cleans up the directory list display by removing pending line commands and messages.
+And so forth.
+The following line commands are available on the z/OS UNIX Directory List panel.
+You enter these line commands alongside the file you'd like to apply the command to.
+So, if you want to rename a file, you'd enter the R line command alongside the file you want to rename.
+These line command result in panels being displayed.
+Let's take a look.
+The Create New z/OS UNIX file panel allows a user to create a file and is invoked using the N line command.
+The user must enter the path name and permissions for the new file and identify the file type.
+When creating a symbolic or external link, the user must identify the file the link refers to.
+Options are available to have data copied from another file or data set into the new file and to edit the new file.
+The sticky bit can also be set on for the new file.
+The Copy From panel allows the data from a file to be copied to another file, sequential data set, or member of a partitioned data set and is invoked using the CO line command against a regular file.
+The user must specify the name of the target z/OS UNIX file, sequential data set, or partitioned data set and member.
+When the data is to be copied to a z/OS UNIX file, the user can specify the permissions for this file.
+The following options are available.  You can be warned if the data is being copied to a target that exists.  When the target is an existing z/OS UNIX file, you can have its permissions updated.
+You can cause a binary copy to occur when copying to a sequential data set or member.
+And you can cause data conversion to take place during the copy operation where an optional conversion table can be specified.
+The Copy From panel allows the data from regular files in a directory to be copied to members in a partitioned data set and is invoked using the CO line command against a directory.
+The user must specify the name of the target partitioned data set.
+The following options are available: Data in existing members can be overwritten with the data from the source file.
+A selection list can be displayed where the user can select the files in the directory that are to be copied.  Files with names containing lowercase characters can be copied.
+Files with names containing suffixes can be copied by having the suffix removed.
+A binary copy can occur when copying to the target member.
+And as with files data conversion can take place during the copy operation.
+The Replace panel allows the data in a regular z/OS UNIX file to be replaced with the data from another file, sequential data set, or member of a partitioned data set.
+The user must specify the name of the source z/OS UNIX file, sequential data set, or partitioned data set and member.
+The following options are available: A binary copy can occur when copying from a sequential data set or member.
+And, yep, we can do data conversion.
+The Copy Into panel allows the data from members in a partitioned data set to be copied into regular files in a directory and is invoked using the CI line command against a directory.
+The user must specify the name of the source partitioned data set.
+The user can specify the permissions to apply to the files the members are copied into.
+The user can also specify a suffix which is appended to the member name to make the name of the regular file created or updated during the copy operation.
+The  usual array of options are available.
+The File Information panel displays the attributes for a file or directory and is invoked using the I line command.
+The Modify pull-down menu contains options to modify either the mode fields or the extended attributes for the file.
+The Modify Mode panel allows the user to change the permissions, set UID bit, set GID bit, and the sticky bit for a file.
+It is invoked using the MM line command or by using the Modify pull-down menu on the z/OS UNIX File Information panel.
+The Execute Command panel allows the user to run a file or execute a z/OS UNIX command, TSO command, CLIST, or REXX exec against a file.
+It is invoked using the X line command against a regular file, directory, or symbolic link to a regular file.
+For a command that runs in z/OS UNIX, the user has the option to run the command under the login shell or directly in z/OS UNIX.
+To simply run the selected file, the user can leave the Command for file field blank.
+By default, the path name of the selected file is appended to the end of the command entered by the user.
+The panel here shows a request to run the c89 command to compile, assemble, and link edit a C program.
+The command is to run in the z/OS UNIX login shell.
+Next up, let's look at how z/OS UNIX works with ISPF.
+
+ISPF and zOS UNIX:
+z/OS provides z/OS UNIX file support into native ISPF EDIT and BROWSE functions.
+The panels are modified so that the “Other” data set name field is a scrollable field which accepts a z/OS UNIX path name of up to 1023 characters in length.
+ISPF assumes a z/OS UNIX path name is entered in this field when the first character is a forward slash, tilde, dot, or two dots.
+A z/OS UNIX directory selection list is displayed when the path name for a directory is specified on any of the following: The View and Edit entry panels, A call to the BROWSE, EDIT, and VIEW services, The edit and view MOVE, COPY, BROWSE, EDIT, and VIEW primary commands, or the browse EDIT, VIEW, and BROWSE commands.
+The directory selection list is almost identical to the list displayed from the z/OS UNIX Directory List Utility.
+The selection list supports the S (select) line command, allowing you to select the file to be processed with the function (for example, edit) that invoked the list.
+The View Entry panel, displayed by using ISPF option 1, is changed to allow a z/OS UNIX file path name to be entered in the Other data set name field.
+Also, the new Record Length field is added to allow a record length to be specified when browsing a z/OS UNIX file.
+The value entered in this field is used by ISPF to display the data in the file as fixed length records rather than using the newline character to delimit each record.
+This is useful for browsing files which would otherwise have very large records if the newline character is used as the record delimiter.
+On the Edit Entry panel, the Record Length field has a slightly different affect than on the View Entry panel.
+With EDIT, ISPF normally treats z/OS UNIX files as having variable length records.
+The Record Length field on the Edit Entry panel allows you to specify a record length which ISPF EDIT will use to load the records from the file into the edit session as fixed length records.
+When the file is saved, it is saved with fixed length records.
+So, the record length field allows you to convert a variable length records file into a fixed length records file.
+On screen we see the difference between browsing a z/OS UNIX file without specifying a record length and browsing a z/OS UNIX file with record length of 40 specified.
+The Edit Entry panel, displayed using ISPF option 2, is changed to allow a z/OS UNIX file path name to be entered in the Other data set name field.
+Also, the new Record Length field is added to allow a record length to be specified when editing a z/OS UNIX file.
+The following ISPF edit primary and macro commands support the specification of a z/OS UNIX path name as an operand.
+Those are COMPARE, COPY, CREATE, MOVE, and REPLACE.
+A path name can be specified in the format accepted as input in the Other data set name field.
+Also, if editing a z/OS UNIX file when these commands are used, a + (plus sign) can be specified as the first character of the path name to represent the path name of the directory containing the file being edited.  Let's take a look at a few examples.
+The COPY command can now be used to copy data from a z/OS UNIX file into the data being edited.
+This is done by specifying the path name for the z/OS UNIX regular file as a parameter with the COPY command or specifying the path name on the Edit Copy panel displayed when no data source is specified with the COPY command.
+If the path name for a directory is specified, a directory selection list is displayed, allowing you to select the regular file to be copied.
+The MOVE command can now be used to move data from a z/OS UNIX file into the data being edited.
+And it works in much the same way as copy - by specifying the path name for the z/OS UNIX regular file as a parameter with the MOVE command or specifying the path name on the Edit Move panel displayed when no data source is specified with the MOVE command.
+Keep in mind that the z/OS UNIX regular file is deleted after the data is moved.
+ISPF personal data set lists are enhanced to support the saving and retrieval of z/OS UNIX file path names.
+Retrieval of path names is supported on those ISPF Edit, View, and Browse panels that allow a path name to be entered in the Other data set name field.
+Retrieval of path names is also supported on the z/OS UNIX Directory List Entry panel.
+The NRETRIEV command also supports the automatic retrieval of path names on those panels that allow z/OS UNIX path names to be specified.
+ISPF personal data set lists support saving and retrieving z/OS UNIX file path names.
+Users can now add UNIX style path names manually to their personal data set lists.
+Personal data set lists are a good way to group (for example, by project) data sets and z/OS UNIX file path names that you use frequently.
+You can use personal data set lists to avoid typing in data set names and z/OS UNIX file path names and to create customized data set lists similar to those using ISPF option 3.4.
+Still with me? We've covered a lot here in this series of videos.
+We're going to switch gears from here on in and start to look at recommendations for file system structure, backup and recovery, and use of the Network File System.
+That's coming up next.
+
+File System Structure:
+
+Let's take a look at how to structure your file system.
+You should organize your user files into multiple HFS data sets.
+This better enables you to manage space, control contention, and manage backup and recovery situations.
+That said this is one way of managing an environment, not the only one and depending on individual requirements might not necessarily be the best way.
+For example, one z/OS data set per user might be difficult to manage.
+Another approach might be to divide the data by application or department.
+Regardless in many cases this is the way to go.
+The /u directory in the root file system should be an empty directory (mount point) for an HFS that contains just directories or mount points for each of your users.
+This HFS data set will be mounted automatically at OMVS initialization.
+As you add users to your system, create a new HFS for each one, mount that HFS at the specific mount point set aside for that user, and then change the ownership of the mount point directory to the user's ID.
+This can be done in a REXX exec to simplify the process of adding a new user.
+The advantages of this organization are that user files are stored in separate z/OS data sets, and the root data set can be kept read-only.
+Automount is an optional facility that comes with z/OS UNIX.
+It can be implemented if desired.
+It mounts user data sets and other data sets as directed.
+Automount only mounts data sets as they are referenced, and these mounts are transparent to the user.
+Both HFS and zFS can be automounted.
+You can use a single automount policy to manage both HFS and zFS file systems.
+The automount facility is a way to ensure that a user's file system is mounted automatically whenever they access a file in it.
+The support group builds a file to identify the users, their file system, and its mount characteristics.
+When the automount facility is started, it monitors file access.
+When a user attempts to access one of their files, automount recognizes the need for a mount.
+If there is no activity to a file system for a defined period of time, automount can unmount the file system.
+This avoids the need for a superuser to mount file systems on request.
+Let's look at another facility for enhanced performance of programs that access files.
+Memory mapped files enable multiple processes to share file data without each doing its own reads and writes.
+This is a function from the XPG4.2 standard.
+The kernel stores the pages of data from the file in a data space.
+A child process inherits the same mapping as defined by the parent (using the mmap() function).
+Another process will need to open the file to map to the same data pages in the data space.
+There are associated commands to ensure that the physical data on the storage device is updated as necessary.
+This diagram provides a logical view of the file system structure and an overview of its interfaces.
+A z/OS UNIX user has multiple interfaces to the hierarchical file system.
+The POSIX interfaces are the C program functions and the shell commands.
+And there's the z/OS interfaces through the TSO/E commands and from high level languages which can use z/OS callable services to access the hierarchical files.
+The hierarchical file system is divided into a logical file system (LFS) and a physical file system (PFS).
+LFS presents a single interface to the file system.
+LFS receives the access request from a user and maps the request to the appropriate PFS.
+The LFS assigns a descriptor to the request from the file descriptor table.
+PFS performs the actual work in the file system.
+There are multiple PFSs in the file system.
+HFS files support files on DASD.
+Pipes support interprocess communication.
+Character special files support terminal communication.
+And socket file systems support program-to-program communications.
+Next up, we're talking backup and recovery.
+
+Backup and Recovery:
+DFSMS is enhanced to provide z/OS V2R4 support for individual UNIX file backup and recovery.
+Just keep in mind that DFSMSdss and DFSMShsm only process zFS data sets.
+So look, in general admins want to use the same tools and applications to backup and restore individual z/OS UNIX files residing in zFS data sets as other z/OS data sets.
+And that support is integrated into existing DFSMShsm backup / recover and DFSMSdss dump / restore capability, allowing for centralized data management across the z/OS platform.
+In the shell, there are three native UNIX utilities you can use to back up and restore files and directories: cpio, tar, and pax.
+These utilities are used to create an archive file that records the contents of the files and directories in a special format.
+This is useful for those who want to stick with the native interfaces, and possibly exchange or transport the archives with other platforms.
+cpio reads and writes either a compact binary header or an ASCII format header.
+There is no limit on length of file name.  tar reads and writes headers in either the TAR format from UNIX systems or the USTAR format defined by POSIX.
+With TAR format, the path name can be 100 characters.
+With USTAR, it can be 255 characters long.
+During backup or restore, tar preserves link information.
+pax combines the power of cpio and tar.
+pax can read and write files in cpio ASCII format, cpio binary format, TAR format, or USTAR format.
+It can read files that were written by cpio, tar, or pax itself.
+pax can do code page conversion.
+To write these archive files to a tape, use OGET to copy them to a z/OS sequential data set, and then use z/OS utilities to copy the data set to tape.
+Now we'll run through this fairly briefly, but the point here is in z/OS Version 2 Release 4, storage administrators are able to manage the backup and recovery of UNIX files (within zFS filesystems) with DFSMSdss and DFSMShsm utilities which are normally used for standard z/OS data sets.
+Here we see the use of BACKDS where we specify things like the HSM backup target location (either DASD or tape), and how to traverse the directory structure with RECURSE.
+And here we have the TSO command HBACKDS and the UNIX shell command hbackup, again with multiple options as to how the backup should be performed.
+We have support for recursion and wildcards.
+We can say things like backup everything in /u/dir1 and it's sub directories but don't span over into different file systems.
+Or backup any files that start with ab[splat].txt with a directory structure in a single filesystem.
+You can also define exclusions, such as don't back up log files.
+Here's how to issue a recover command with the option for the file to recover and options for replacement and recursion.
+Here we see a TSO command to recover file2 specifying options for REPLACE WAIT.
+A UNIX shell command example is also shown here.
+And here's batch JCL to use the DFSMSdss DUMP and RESTORE command to request a backup of a z/OS UNIX file using absolute path names.
+To use DFSMSdss to dump UNIX files we show an example here specifying a PATH to the files to be backed up, a WORKINGDIRECTORY specifying the directory to be backed up, and OUTDDNAME describing the output data set that holds the backup contents.
+And to perform a DFSMSdss restore we specify the PATH of the files to be restored, the WORKINGDIRECTORY of where DSS should restore, and INDDNAME identifying the input dump data set.
+So that's a whistlestop tour of backup and recovery.
+Next, we'll see how hierarchical files on z/OS can be accessed from a workstation by using NFS.
+
+NFS and File Security:
+Network File System (NFS) is the strategic file sharing protocol for the z/OS platform.
+The DFSMS/MVS NFS Server (NFSS) feature implements the NFS protocols.
+NFSS enables the host processor to act as a file server to authorized NFS clients in a TCP/IP network.
+NFSS allows remote access to data on the z/OS host from workstations, personal computers, or any other system in the network that is using NFS client software.
+A client system can be Windows or any UNIX/Linux system with NFS client software, and z/OS.
+And the NFS server allows access to z/OS data sets and HFS files on the z/OS host as if they were local files on the client system.
+A workstation user can access the z/OS file system by using the mvslogin command to log into z/OS.
+A z/OS user ID, password, and authorization to access requested files is needed.
+The MOUNT command is used to create a temporary link between specific z/OS data sets and an empty UNIX directory or a dummy PC drive.
+A z/OS high level qualifier is used in the MOUNT command to specify which z/OS data sets to mount at a mount point.
+The z/OS data sets beginning with the specified high level qualifier appear as files under the mount point.
+If the specified data sets include partitioned data sets, a second level of hierarchy is shown.
+The NFSS support for z/OS UNIX provides transparent access to HFS file systems mounted by an NFS client.
+The NFS client user is not restricted to z/OS naming conventions for HFS data access.
+Path names and file names can contain special characters and can be mixed case, go wild! An NFS client user can mount a part of the z/OS UNIX HFS on their local file system and thereafter create, delete, read, write, and otherwise treat that part of the z/OS UNIX file system as an extension to their local workstation file system.
+Okay so let's now transition into file security.
+In z/OS UNIX, each user has a user ID (UID) and a group ID (GID).
+When a user creates a directory or a file, it is automatically associated with the user's UID, and the GID is set to the GID of the parent directory.
+A user's UID and GID can be defined in RACF or an equivalent security product.
+The system verifies that a user or a program has access to a file by comparing the UID and GID in RACF with the definitions in the hierarchical file system.
+There are three classes of users: Owner- the user's UID must match the UID for the file, Group- a member of any group whose GID matches the GID of the file.
+And Other- anyone else.
+Access to files and directories is controlled by permission bits.
+Each file gets its permission bits set when it is created.
+The permission bits can be changed by the chmod command.
+Those are Read: notated by r, Write: notated by w, and Execute: notated by x.  The diagram shows a conceptual overview of how file security is controlled.
+A user with UID=103 and GID=42 wants to open file /usr/lib/lib.a.
+The system checks with RACF if UID=103 and GID=42 are valid and, if they are valid, what authority they have to access the file lib.a.
+User UID=103 is not the owner of this file but belongs to the same group the file is associated with.
+The group permission is rwx which means that this user will have read, write, and execute access to the file.
+As this chart shows, the permission bits have different meanings when related to files and directories.
+If you want to put a new file in a directory, you need both search and write access to the directory.
+The system needs to search the directory to determine if the entry is already there.
+As you create files and directories default permission bits are defined.
+These differ depending on the method used to create the entity.
+The z/OS UNIX file system can be accessed by using a bunch of methods.
+TSO/E has commands for browsing and editing HFS files, copying data between HFS files and z/OS data sets, mounting file systems, and invoking the z/OS UNIX shell.
+There is also a command called ISHELL which provides an ISPF menu-driven interface to the file system.
+JCL provides keywords which support the specification of HFS path names.
+REXX has a set of z/OS UNIX extensions (syscall commands) to access z/OS UNIX callable services.
+z/OS UNIX shell is the UNIX interface to the file system.
+It contains commands and utilities to access HFS files.
+z/OS UNIX supports many C functions to access HFS files.
+And finally shell scripts, which are similar to REXX execs, where shell commands and utilities can be stored in a text file which can be executed.
+There are TSO/E commands which support the hierarchical files.
+For example, MKDIR creates a new directory, and MKNOD creates a character special file.
+OEDIT creates or edits a file using ISPF editor, and OBROWSE browses a file using ISPF.
+And ISHELL or ISH invokes the z/OS ISPF shell panel interface.
+File copy between z/OS data sets and HFS files can be useful if you need to send and receive files between z/OS systems for DFSMS backup and restore of HFS files or to copy HFS files to tapes.  OGET copies an HFS file into an z/OS sequential file or a PDS/PDSE member.
+Code page conversion can be specified.
+OGETX does the same thing for an HFS directory.
+OPUT copies a z/OS sequential file or a PDS/PDSE member into an HFS file, and OPUTX copies all members of a PDS/PDSE into an HFS directory.
+And OCOPY copies data in either direction between a z/OS data set and an HFS file using DD names.
+The cp and mv UNIX commands have support for z/OS data sets.
+To specify a z/OS data set name, precede the name with double forward slashes (//).
+To cp or mv to a PDS or PDSE, the data set must be allocated before the copy or move.
+The same is true for pax and tar for creating portable archives or extracting files from the archive.
+Don't forget those double forward slashes for z/OS data set names.
+And speaking of which, let's quickly recap the difference in file identification.
+In z/OS, a data set is identified by a data set name.
+If the data set is a PDS or PDSE, the file has a member name.
+The characteristics of the data sets are kept in catalogs or the VTOC (volume table of contents).
+Executable modules can have multiple names through an ALIAS.
+In the hierarchical file system, files are identified by path names which consist of directory names and the file name.
+Files can have multiple names created by symbolic links and hard links.
+There is no concept of a defined record format or block size.
+But despite these differences, as you can see there's some great support between z/OS data sets and z/OS UNIX files.
+And that wraps up the module.
+Like I said at the beginning there was a lot to cover here but that gives us a great grounding for the rest of this class.
+
+

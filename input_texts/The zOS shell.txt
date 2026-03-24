@@ -1,0 +1,379 @@
+The zOS shell:
+In this series of videos, we're going to introduce the z/OS UNIX shell and utilities.
+We'll learn how to use some basic shell commands and how to navigate between TSO and the shell.
+The shell is the interactive interface to z/OS UNIX.
+It is part of the z/OS UNIX Application Services base element of z/OS.
+Although some functions can be performed by TSO/E, it is recommended that you make use of the shell and know your way around it.
+The shell enables you to invoke shell commands and utilities, write shell scripts using the shell programming language, and run shell scripts and C language programs interactively, in the background, or in batch.
+Shell commands are typically short, and they can be combined in pipes or shell scripts.
+Once a shell command begins executing it has access to the following three files.
+First there's STDIN: standard input.
+The default standard input is the keyboard.
+STDOUT is standard output, and the default is the screen.
+And STDERR is standard error, where the default is also the screen.
+There are no additional installation steps for the shell and debugger if the Application Services feature has been installed.
+This diagram shows a high level overview of the z/OS UNIX terminal support.
+A user invokes the shell from TSO/E by issuing a TSO/E command called OMVS.
+A shell user must be a TSO/E user.
+The network connection to the shell by using TSO/E can be either VTAM or TCP/IP.
+z/OS UNIX supports block mode and canonical mode 3270-type terminals.
+Character asynchronous terminals and non-canonical (raw) mode terminals are not supported.
+Alternatively, a user can connect directly to UNIX by using TCP/IP.
+This is the only way raw mode is possible.
+A user can invoke the shell from an ASCII terminal.
+The network connection to the shell in this attachment is TCP/IP.
+A terminal attached to z/OS directly through TCP/IP uses the rlogin or Telnet capability in the terminal to connect to a daemon in z/OS that will start a shell address space for that user.
+In this case, the user is accessing a shell address space unique to them in z/OS.
+The rlogin or Telnet users need a pair of pseudo-TTY files.
+These come from the same pool the TSO-attached terminals use.
+Raw mode is supported; vi editor can be used in this environment.
+Next, we'll look at two choices that z/OS UNIX offers to TSO interactive users.
+
+TSO and UNIX Shell:
+
+z/OS UNIX offers TSO interactive users the choice and ability to switch between the UNIX-like interface of the z/OS UNIX shell and command interpreter and the traditional TSO/E panel or command interface.
+So, users of z/OS UNIX can choose the interface with which they are most familiar.
+UNIX users can use the z/OS UNIX shell (OMVS), and TSO users can use the shell under TSO (ISHELL).
+An installation can customize TSO/E logon so that users who prefer a UNIX-like interface are put directly into the z/OS UNIX shell.
+From there, the users can choose to switch to TSO/E when desired or required.
+Now what sort of interactions can occur between TSO/E and the shell? Well you might move data between z/OS data sets and the hierarchical file system.
+Or issue TSO/E commands from the shell command line.
+You can also write z/OS JCL that includes shell commands.
+This is an example of how a user can log on to TSO/E, do some work there, invoke the shell to perform some functions, switch back and forth between TSO/E and the shell, and log off from the shell.
+So first a TSO/E user logs on to TSO/E and issues some TSO/E commands or uses the ISPF/PDF panels to do some work.
+The user issues the OMVS command to invoke the z/OS UNIX shell.
+After issuing the OMVS command, the TSO/E user becomes a logged on shell user.  The shell user is interactively communicating with the z/OS UNIX environment through the shell and has all the facilities of the shell available.
+The user can jump (escape) back to TSO/E, run a TSO/E command, and return to the shell.
+When jumping back and forth between TSO/E and the shell, the user remains logged on to both environments.
+Finally in our example the user issues an exit command to log off from the shell and returns to TSO/E.
+The ISHELL command is used to invoke the ISPF shell of UNIX System Services.
+ISHELL can only be issued from TSO/ISPF.
+Many people with a z/OS background prefer to use this interface.
+The OMVS command is a TSO command that is used to invoke the shell.
+OMVS can be entered from plain TSO or from the ISPF TSO command.
+Many people with a UNIX background like this interface better; however, it is not exactly the same as a standard UNIX interface.
+For example, raw mode is not possible, so the vi editor cannot be used.
+Some users with a UNIX background prefer raw mode access which can be established by using the Telnet and rlogin interface.
+This is the screen that is displayed when a user invokes the shell from TSO.
+At the bottom of the screen, you see the following.
+The command line ( those equal signs and the greater than sign) is used for input.
+The default function key settings and the default escape character assignment are shown along the bottom.
+The function keys can be customized or turned off.
+The status indicator is in the right hand corner.
+When you first enter the shell, the status is RUNNING.
+The prompt is an indication from the shell that it is ready to accept input from the command line.
+The prompt is often customized.
+In a plain standard environment, the prompt is $ for a normal user and # for a superuser.
+Since "OMVS sessions (2)" was used from TSO in the example here, two UNIX sessions were established.
+You can see the session number at the bottom right corner.
+To jump from one session to the next, use F2 to get the subcommand prompt and then enter the command next to jump to the next session.
+Note also that some welcome text might be displayed when entering the shell.
+Welcome text is defined by the system programmer.
+The rlogin or telnet commands used by the user are in the syntax of the remote system.
+The rlogin command names the z/OS system that you want to connect to and a username if you are logging onto z/OS with a different user identity.
+The telnet command may name the terminal type, the host name or IP address, and the port number if different from the well-known ports used by TCP/IP daemons.
+In either case, z/OS asks the user for a password or password phrase.
+On the z/OS UNIX system the inetd system daemon must be running to receive these requests.
+It creates an address space for each user which contains the appropriate server daemon (rlogind or otelnetd).
+The shell is started by this daemon after it validates the user’s identity.
+The daemon is also responsible for ASCII to EBCDIC conversion as data flows from the terminal to the host.
+A password phrase is a string consisting of mixed case letters, numbers, and special characters, including blanks, that is used to control access to data and systems.
+Support for a password phrase enables a user to enter a password phrase of 9-100 characters.
+There are several commands and daemons are affected or enhanced with password phrase support.
+Obviously, there's the passwd command to change user passwords or phrases.
+There's the su command to change the user ID associated with a session.
+And the rlogin program is the server for the remote rlogin command commonly found on UNIX systems.
+Passwords 1-8 characters long are assumed to be passwords.
+Passwords 9-100 characters long are assumed to be password phrases.
+This is an example of the screen that is displayed when a user invokes the shell after logging on with rlogin or telnet.
+The $ (dollar sign) prompt is the standard prompt.
+A user might decide to use a prompt other than $ (dollar sign) as this example shows.
+The shell works in line mode.
+This means the input is not processed until the user presses the Enter key.
+When an application that requires character mode (or raw mode) support is invoked, the shell will run the application as defined.
+For example, the vi editor executes in character mode (raw mode), and when you exit this editor the shell returns to line mode.
+Here's a comparison of the capabilities available with the two log in methods.
+rlogin is direct to z/OS.
+rlogin users have access to TSO only through the shell TSO command.
+An rlogin terminal is an ASCII terminal, a TSO terminal is EBCDIC.
+To emulate an ASCII command under TSO, you use the escape character as defined in the OMVS command.
+Next up, commands and jobs.
+Now we can talk about some shell commands that are the same for everyone once you are logged onto a shell.
+The z/OS UNIX shell is, above all, a programmer's interface.
+The shell has many general tools that can help any programmer, and, in addition, there are several commands designed especially for the C programmer.
+Shell commands are entered on the command line.
+Shell command options are usually specified by a minus (-) sign followed by a single character, for example ,ls -l. Some commands accept options that have accompanying arguments, for example, ls -l /usr/lib.
+The argument may be a number, a string, a file name, or something else.
+A shell command can be interrupted and stopped by typing <EscChar+C>.
+Entering a command with -? or entering it incorrectly results in the command syntax being displayed.
+Once a shell command begins running, it has access to the following three files: Standard Input with a file descriptor or identified of 0, Standard Output (file descriptor 1), and Standard Error (file descriptor 2).
+A shell user can redirect the input, output, and error files.
+To redirect output to a file, enter >filename at the end of a command, for example, sort -u file1 > outfile.
+If the file does not exist, it will be created, and if it does exist, the output writes over any information in the file unless >>filename is specified to append the output to the existing file.
+The shell commands are a powerful tool for the shell user because multiple commands can be combined on a single command line.
+To run a series of commands, one after the other use a semicolon.
+Or use  && (double ampersand) and || (double vertical bar).
+When stringing together multiple commands, these characters can be used to control whether or not the second command should be run.
+If the command that precedes && completes successfully, the second command is run.
+If the command that precedes || fails, the command following || is run.
+You can also run more than one command concurrently by using a pipe between commands.
+The idea of a pipeline is that the output from one command is piped in as input to the next command.
+Many shell commands are well suited to be used in a pipeline.
+When a command is entered in the shell, another command cannot be entered until the shell prompt appears.
+The job runs as a foreground job.
+Shell commands that take a long time to complete can be run in the  background.
+The shell does not wait for a job running in the background to complete before presenting a prompt.
+Because, you know, it's running in the background.
+When a shell command is entered, a new process is started.
+The shell runs the command in its own process group.
+It is considered a separate job, and the shell assigns it a job identifier.
+The job identifier is a number known only to the shell.
+The system assigns the process a process group identifier (PGID) and a process identifier (PID).
+When only one command is entered, the PGID is the same as the PID.
+When multiple commands are entered using a pipe, several processes with their own PID will be started.
+All these processes have the same PGID and shell job number.
+To check the status of shell commands, the commands jobs or ps can be used.
+The jobs command displays the status of currently running background jobs.
+The ps command displays the status of currently running processes.
+A foreground job can be canceled by entering <EscChar+Z>.
+A background job is canceled by using the kill or superkill command.
+To stop a foreground job, enter <EscChar+Z>.
+To stop a background job, use the kill command with the stop option.
+And a job can be delayed from running until another background job has completed by using the wait command.
+The submit command sends a batch job to the primary job entry subsystem (JES) for processing.
+The filename argument can either be a UNIX path name, data set, or input from standard input.
+If the submit command is successful, the job ID of the submitted job and the file name are displayed as part of the output written to standard output unless modified by the -j option.
+The JCL must have a job card.
+If a job card is not present, the submit command will fail.
+tsocmd allows you to run a TSO/E command from the shell, including authorized TSO/E commands.
+Invoke it from a shell script or prompt.
+It's best that the TSO/E command and its parameters be enclosed in quotes to avoid shell parsing.
+The z/OS UNIX shell uses environment variables to define characteristics of the shell environment.
+These variables can be modified to a specific installation's or user's needs.
+Using environment variables provides a flexible method for customizing the shell.
+The system initializes the shell for the user after the user enters a command to log in to the shell.
+During the initialization, the system sets environment variables for the user LOGNAME, HOME, and SHELL from information in the RACF user profile.
+LOGNAME is the user ID that remote systems use when dialing in to your system.
+HOME is a variable for the path name of a user's working directory.
+And SHELL identifies the shell to be invoked.
+Environment variables can be defined in the RACF user profile, the /etc/profile, the $HOME/.profile file, the file named in the ENV environment variable, and in a shell command or shell script.
+The C shell with all its commands and tools provides a real programmer's interface.
+It is specifically designed to have syntax similar to the C programming language.
+The comparison between the standard and the C shell shows which files are related and what has to be customized from the system programmer's point of view.
+Okay and that's a wrap on the z/OS UNIX shell and utilities.
+You can now EscChar+Z out of this process.
+
+Getting help with commands:
+We'll open up our discussion about z/OS UNIX shell commands by discussing how you can learn the syntax of any shell command, and some of the code page considerations you'll need to keep in mind.
+Shell commands are entered either at the shell command prompt when you are logged in directly to the shell through rlogin or Telnet or at the command line at the bottom of the screen when you are logged in to the shell through TSO using the OMVS command.
+When you are logged in to the shell through TSO, the commands entered at the command line are echoed at the command prompt.
+If any output is generated by the command, it appears on the terminal screen following the command by default.
+When a command is entered, it is often followed by arguments.
+The delimiters between the command and the various arguments are spaces.
+At least one space is required, but you can type more than one space as a delimiter.
+Anything other than spaces are considered to be part of the command string itself.
+This makes sense because almost any character is valid as part of a path name, and there are many wildcard characters and other metacharacters that UNIX recognizes.
+Commands often consist of just a few characters, for example, ls for the list command, cp for the copy command, and pwd for the print working directory command.
+The format of z/OS UNIX shell commands (in both command entry and command syntax diagrams) is the same as for other UNIX systems.
+Therefore, the ls command, for example, is entered the same way.
+It has the same syntax (except for a few options that might be different on different systems) and produces similar results on z/OS UNIX, and other UNIX systems.
+In syntax diagrams, found in manuals or produced by the man command, brackets might appear around a list of items like options.
+The values that appear inside the brackets are optional items and might or might not be entered.
+Any arguments appearing outside of brackets are required items and must be entered.
+Speaking of documentation, the man command is a shell command which stands for manuals.
+It is the UNIX online help command.
+The man command displays sections from the online command reference manual describing the command in question.
+For example, typing man ls produces the reference manual entry that describes the usage of the ls command.
+The output from the man command often consists of many lines of data, much more than what appears on one screen.
+Normally, output sent to the terminal screen scrolls across the screen until all of the output has been displayed.
+This is not the case with man.
+Output from the man command is formatted and displayed one screen at a time.
+Pressing the Enter key displays the next line of output, while pressing the Space Bar displays the next screen of output.
+To exit from the man output without displaying all of the screens, press the Q key (for quit).
+When you are logged in to the z/OS UNIX shell from TSO using the OMVS command, there are often two different code pages being used.
+The default U.S. English z/OS/TSO code page is CP00037, and the default z/OS UNIX code page is CP01047.
+There are two characters which are mapped differently in these two code pages, the left and right square brackets([ ]).
+These characters are used in command syntax diagrams and are displayed on the screen when using the man command.
+These two characters are not displayed correctly when coming into the shell through TSO.
+A code page for a character set determines the graphic character produced for each hexadecimal code.
+The code page is determined by the programs and national languages being used.
+For most countries, z/OS uses one code page, and the z/OS UNIX shell uses a different one.
+To complicate the matter, many users have workstations which use an ASCII based code page.
+When moving data between these environments, the data might have to be converted between the code pages to maintain the same characters.
+This might result in different hexadecimal codes depending on the code pages being used.
+There are code page conversion tables located in SYS1.LINKLIB which can be used to convert between the z/OS code page and the shell code page for the national languages supported by the z/OS UNIX shell.
+The source for these code page tables can be found in SYS1.SAMPLIB.
+They can be used as samples for creating a new table if an installation has special requirements.
+The CONVERT parameter on the OMVS command is used to set up a code page conversion table that handles input to z/OS UNIX and output displayed at the terminal in the shell environment.
+The table BPXFX111 is for translation between z/OS code page IBM-037 and z/OS UNIX code page IBM-1047.
+This would be used by most shell users in the U.S.
+The other example is for a conversion table that is located in a PDS named UNIX.LINKLIB.
+If you are accessing the shell through the rlogin or Telnet interface, automatic and correct conversion is provided.
+In order to properly display the square brackets, you must use the right code page.
+Unfortunately, the 3270 emulator program cannot change the code page spontaneously but it's easily addressed.
+Simply log off and log on again when changing code pages.
+Instead of using the man command, you can also reach this z/OS manual entry from the UNIX shell by entering ohelp man.
+The OHELP command, a TSO command, provides an online help function for shell commands, C functions, and z/OS UNIX callable services.
+To use OHELP, the BookManager READ product must be installed on the z/OS system.
+Note that the code page here is set to 0037 in the 3270 emulator program, so it fits the code page of z/OS TSO/ISPF.
+Here, the code page is set to 1047 in the 3270 emulator program.
+It does not fit the code page of z/OS TSO/ISPF, but it does fit the code page of the UNIX shell.
+To perform code page conversion, we can use OMVS CONVERT.
+The format is OMVS CONVERT(data_set_name(member_name)).
+If data_set_name is omitted, z/OS locates member_name using the default search order for modules in the system library concatenation.
+The located member_name is used as the character conversion table.
+For example, if you specify OMVS CONVERT((BPXFX111)), the character conversion table is BPXFX111 in the default module search order in the system library concatenation.
+
+File System Shell Commands:
+We'll open up our discussion about z/OS UNIX shell commands by discussing how you can learn the syntax of any shell command, and some of the code page considerations you'll need to keep in mind.
+Shell commands are entered either at the shell command prompt when you are logged in directly to the shell through rlogin or Telnet or at the command line at the bottom of the screen when you are logged in to the shell through TSO using the OMVS command.
+When you are logged in to the shell through TSO, the commands entered at the command line are echoed at the command prompt.
+If any output is generated by the command, it appears on the terminal screen following the command by default.
+When a command is entered, it is often followed by arguments.
+The delimiters between the command and the various arguments are spaces.
+At least one space is required, but you can type more than one space as a delimiter.
+Anything other than spaces are considered to be part of the command string itself.
+This makes sense because almost any character is valid as part of a path name, and there are many wildcard characters and other metacharacters that UNIX recognizes.
+Commands often consist of just a few characters, for example, ls for the list command, cp for the copy command, and pwd for the print working directory command.
+The format of z/OS UNIX shell commands (in both command entry and command syntax diagrams) is the same as for other UNIX systems.
+Therefore, the ls command, for example, is entered the same way.
+It has the same syntax (except for a few options that might be different on different systems) and produces similar results on z/OS UNIX, and other UNIX systems.
+In syntax diagrams, found in manuals or produced by the man command, brackets might appear around a list of items like options.
+The values that appear inside the brackets are optional items and might or might not be entered.
+Any arguments appearing outside of brackets are required items and must be entered.
+Speaking of documentation, the man command is a shell command which stands for manuals.
+It is the UNIX online help command.
+The man command displays sections from the online command reference manual describing the command in question.
+For example, typing man ls produces the reference manual entry that describes the usage of the ls command.
+The output from the man command often consists of many lines of data, much more than what appears on one screen.
+Normally, output sent to the terminal screen scrolls across the screen until all of the output has been displayed.
+This is not the case with man.
+Output from the man command is formatted and displayed one screen at a time.
+Pressing the Enter key displays the next line of output, while pressing the Space Bar displays the next screen of output.
+To exit from the man output without displaying all of the screens, press the Q key (for quit).
+When you are logged in to the z/OS UNIX shell from TSO using the OMVS command, there are often two different code pages being used.
+The default U.S. English z/OS/TSO code page is CP00037, and the default z/OS UNIX code page is CP01047.
+There are two characters which are mapped differently in these two code pages, the left and right square brackets([ ]).
+These characters are used in command syntax diagrams and are displayed on the screen when using the man command.
+These two characters are not displayed correctly when coming into the shell through TSO.
+A code page for a character set determines the graphic character produced for each hexadecimal code.
+The code page is determined by the programs and national languages being used.
+For most countries, z/OS uses one code page, and the z/OS UNIX shell uses a different one.
+To complicate the matter, many users have workstations which use an ASCII based code page.
+When moving data between these environments, the data might have to be converted between the code pages to maintain the same characters.
+This might result in different hexadecimal codes depending on the code pages being used.
+There are code page conversion tables located in SYS1.LINKLIB which can be used to convert between the z/OS code page and the shell code page for the national languages supported by the z/OS UNIX shell.
+The source for these code page tables can be found in SYS1.SAMPLIB.
+They can be used as samples for creating a new table if an installation has special requirements.
+The CONVERT parameter on the OMVS command is used to set up a code page conversion table that handles input to z/OS UNIX and output displayed at the terminal in the shell environment.
+The table BPXFX111 is for translation between z/OS code page IBM-037 and z/OS UNIX code page IBM-1047.
+This would be used by most shell users in the U.S.
+The other example is for a conversion table that is located in a PDS named UNIX.LINKLIB.
+If you are accessing the shell through the rlogin or Telnet interface, automatic and correct conversion is provided.
+In order to properly display the square brackets, you must use the right code page.
+Unfortunately, the 3270 emulator program cannot change the code page spontaneously but it's easily addressed.
+Simply log off and log on again when changing code pages.
+Instead of using the man command, you can also reach this z/OS manual entry from the UNIX shell by entering ohelp man.
+The OHELP command, a TSO command, provides an online help function for shell commands, C functions, and z/OS UNIX callable services.
+To use OHELP, the BookManager READ product must be installed on the z/OS system.
+Note that the code page here is set to 0037 in the 3270 emulator program, so it fits the code page of z/OS TSO/ISPF.
+Here, the code page is set to 1047 in the 3270 emulator program.
+It does not fit the code page of z/OS TSO/ISPF, but it does fit the code page of the UNIX shell.
+To perform code page conversion, we can use OMVS CONVERT.
+The format is OMVS CONVERT(data_set_name(member_name)).
+If data_set_name is omitted, z/OS locates member_name using the default search order for modules in the system library concatenation.
+The located member_name is used as the character conversion table.
+For example, if you specify OMVS CONVERT((BPXFX111)), the character conversion table is BPXFX111 in the default module search order in the system library concatenation.
+
+More Shell Commands:
+When you enter a shell session you are “pointed to” a particular directory in the file system hierarchy.
+This directory is called the current working directory (cwd).
+The value of the current working directory is initially assigned as your home directory as found in the OMVS segment of your user security profile in the z/OS security system (like RACF).
+Your home directory is the directory that belongs to you.
+It is where you place your personal files and subdirectories.
+Your cwd is the directory which you happen to be pointed to at any given time.
+The environment variable $HOME (dollar home) holds the value of your home directory.
+Your home directory never changes and neither does the value of $HOME.
+But your current working directory might change from time to time.
+Many shell commands allow you to specify a path name or a directory name.
+If you do not specify a path name or directory name, the command often defaults to your current working directory.
+When you enter the ISHELL, you do not have a current working directory.
+You can assign yourself a cwd in the ISHELL, and, once assigned, you can change it whenever you want.
+Path names that are entered in the UNIX environment are either absolute or relative path names.
+Absolute path names always begin with a slash, and that leading slash indicates the root directory.
+Therefore, an absolute path name always begins its search at the root directory.
+Relative path names never begin with a slash.
+A relative path name always begins its search at the current working directory.
+The cwd is the directory that you are pointed to at any given time.
+In the shell, you can point to another directory, (that is, change your cwd), by using the shell cd command (change directory).
+To assign or change a cwd in the ISHELL, type the directory that you want to assign in the pathname field on the main menu.
+Then, go to the Directory action bar item and press Enter to pull down the Directory menu.
+Finally, select the option Set working directory.
+Alright, let's get into a whole bunch more commonly used shell commands.
+The shell cd command allows you to ... you know this from a few minutes back...
+change your current working directory.
+The cd command produces no output, but the cwd is changed, and the environment variable $PWD is updated to reflect that change.
+You can specify either a relative path name or an absolute path name on the cd command.
+When any directory is created, it contains two entries created by UNIX.
+These entries are commonly called dot (.), and dot dot (..).
+The dot entry, typed as a single period, represents the directory itself.
+This is useful when you want to execute a file in the current working directory, and that directory is not specified in your $PATH variable.
+Simply type ./filename, where filename is the name of the file to be executed.
+There are also many commands which require a path name to be entered (for example, the cp command).
+If you wish to use the current working directory as the path name, simply type the dot rather than typing the absolute path name of the cwd.
+The shell mkdir command (make directory) creates a directory for you.
+As with the cd command, you can type either an absolute or a relative path name to specify the directory that you want to create.
+You can also create multiple directories at the same time by specifying multiple path names with a single make directory command.
+A directory cannot be created if there is no path to the directory.
+In other words, if you were to type mkdir /u/tsa0011/dira/dirb, and dira did not exist, then dirb cannot be created.
+It was for this reason that the ability to create a directory tree structure was developed, by using the -P option of mkdir.
+Typing mkdir -P /u/tsa0011/dira/dirb creates the necessary directories in the tree so that dirb is successfully created.
+If dira did not exist, it is created under tsa0011, and then dirb is created under dira.
+The shell chmod command allows you to change the permission bits (mode) of files or directories.
+As before, you can enter an absolute or a relative path name to identify the files to be changed.
+Only a superuser or the owner of a file can issue chmod against that file.
+You can change multiple files to the same mode by typing multiple path name arguments in the chmod command.
+Using the -R (note that it is an uppercase R) option, which stands for recursive, allows you to specify a directory and change not only the mode of that directory but also all files and subdirectories below that directory.
+There is another form of chmod called the symbolic form.
+With the symbolic form, you specify exactly which permission bits you want to change.
+The rest of the permission bits are left unchanged.
+Who can use the chmod command? Users with read access to UNIXPRIV class profile SUPERUSER.FILESYS.CHANGEPERMS can use the chmod command to change the permission bits of any file.
+A superuser with UID=0 or has READ access to RACF facility class BPX.SUPERUSER.
+And the owner.
+The shell sort command sorts input data in many different ways.
+The default sort order is an ASCII ascending sort against the first field of the file.
+A field is a string of characters delimited by white space (blanks or tabs).
+With other options, you can sort in numeric order, dictionary order (ignores case), month-by-month order, reverse (descending) order, and so forth.
+You can also select which fields to sort within the file.
+That is what the -k option does.
+The startpos (starting position) keyword identifies the field, by number, against which to start the sort.
+Entering sort -k 3 myfile sorts the file called myfile in ASCII ascending order, beginning at the third field of each record in the file.
+The shell cat command stands for concatenate, which means to join together.
+The cat command joins an input file with an output file.
+The first argument passed to cat is assumed to be an input file path name, and the default output file is the terminal screen.
+Therefore, cat can be used to display file content on the screen.
+The file content to be displayed might be more than fits on one screen.
+In that case, the shell more command might be more appropriate.
+The cat command can also be used to copy a file.
+The OEDIT and OBROWSE commands are both TSO commands, but they also have UNIX shell counterparts.
+Note that the shell oedit and obrowse commands are both lowercase.
+The OEDIT (uppercase) and oedit (lowercase) commands invoke the ISPF editor against a UNIX file.
+If the file does not exist, it is created dynamically.
+You are placed into a true ISPF Edit session.
+When you save your changes or additions, the data is written into the UNIX file you specified on the command.
+When you invoke the TSO OEDIT command, you should specify an absolute path name enclosed within single quotes.
+The OBROWSE and obrowse commands invoke ISPF Browse (not ISPF View) against a UNIX file.
+Again, this is a true ISPF Browse session.
+If you invoke any of these four commands without specifying a path name, you are presented with an ISPF panel where you can enter the path name of the target file.
+The OPUT command copies one sequential data set or one member of a partitioned data set into an HFS file.
+The target file that you specify might not be a directory, and the file is created if it does not already exist.
+The OPUTX command copies all members of a partitioned data set to files in a specified directory.
+The OGET command copies one HFS file to a sequential data set or to a member of a partitioned data set.
+If you are copying to a partitioned data set member, you must specify the member name as well as the data set name.
+The OGETX command copies all of the files from a specified directory to members of a partitioned data set.
+The member names are the uppercase equivalents of the HFS file names.
+If a file name to be copied is longer than eight characters or uses characters that are not allowed in a z/OS data set name, that file is not copied.
+There are various operands you can use on these commands to specify that the data to be copied is binary data, text data, and that data conversion should take place (for example, from the IBM-1047 to the IBM-037 or ASCII code pages).
+And there we go, a whole bunch of shell commands that you'll likely be able to make good use of.
+In the next module we'll look at working with the shell.
+
